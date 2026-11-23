@@ -143,8 +143,11 @@ M.net = function (tasks, deps, o = {}) {
   const lvl = {}; const order = cp.order;
   order.forEach(id => { lvl[id] = Math.max(0, ...deps.filter(d => d[1] === id).map(d => lvl[d[0]] + 1)); });
   const cols = {}; order.forEach(id => (cols[lvl[id]] = cols[lvl[id]] || []).push(id));
-  const colW = o.colW || 150, rowH = o.rowH || 70, maxRows = Math.max(...Object.values(cols).map(c => c.length));
-  const nodes = tasks.map(t => { const c = cols[lvl[t.id]], i = c.indexOf(t.id); return { id: t.id, t: t.t, sub: t.d + (o.unit || ' d'), x: 80 + lvl[t.id] * colW, y: 40 + (i + (maxRows - c.length) / 2) * rowH, w: 124, hl: o.noCP ? false : cp.path.includes(t.id) }; });
+  const brk = s => { if (s.length <= 14 || s.includes('\n')) return s; const sp = [...s.matchAll(/ /g)].map(m => m.index); if (!sp.length) return s; const k = sp.reduce((a, b) => Math.abs(b - s.length / 2) < Math.abs(a - s.length / 2) ? b : a); return s.slice(0, k) + '\n' + s.slice(k + 1); };
+  const lab = {}; tasks.forEach(t => lab[t.id] = brk(t.t));
+  const wOf = id => Math.max(96, Math.max(...lab[id].split('\n').map(x => x.length)) * 7.4 + 18);
+  const colW = o.colW || Math.max(...tasks.map(t => wOf(t.id))) + 34, rowH = o.rowH || 78, maxRows = Math.max(...Object.values(cols).map(c => c.length));
+  const nodes = tasks.map(t => { const c = cols[lvl[t.id]], i = c.indexOf(t.id); return { id: t.id, t: lab[t.id], sub: t.d + (o.unit || ' d'), x: colW / 2 + 10 + lvl[t.id] * colW, y: 44 + (i + (maxRows - c.length) / 2) * rowH, w: wOf(t.id), hl: o.noCP ? false : cp.path.includes(t.id) }; });
   const onPath = (a, b) => !o.noCP && cp.path.indexOf(a) > -1 && cp.path.indexOf(b) === cp.path.indexOf(a) + 1;
   const edges = deps.map(([a, b]) => ({ a, b, hl: onPath(a, b) }));
   const cap = o.cap || (o.noCP ? '' : `Critical path (green) = ${cp.path.map(id => tasks.find(t => t.id === id).t.replace(/\n/g, ' ')).join(' → ')} = ${cp.len}${o.unit || ' days'}.`);
@@ -153,11 +156,12 @@ M.net = function (tasks, deps, o = {}) {
 
 /* ---------- simple bar chart ---------- bars: [{lab, v}], o.line: value for a dashed reference line */
 M.bars = function (bars, o = {}) {
-  const bw = o.bw || 46, gap = 18, L = 40, H = o.H || 150, top = 16, mx = Math.max(...bars.map(b => b.v), o.line || 0) * 1.15;
+  bars.forEach(b => { b.lab = b.lab || b.t || ''; if (b.hl && !b.c) b.c = 'var(--good)'; });
+  const bw = o.bw || Math.max(46, ...bars.map(b => b.lab.length * 6.4)), gap = 18, L = 40, H = o.H || 150, top = 16, mx = Math.max(...bars.map(b => b.v), o.line || 0) * 1.15;
   const W = L + bars.length * (bw + gap) + 20;
   let s = `<svg viewBox="0 0 ${W} ${H + top + 30}" width="${W}" role="img" aria-label="bar chart">`;
   s += `<line x1="${L - 6}" y1="${top + H}" x2="${W - 6}" y2="${top + H}" stroke="var(--ink2)"/>`;
-  bars.forEach((b, i) => { const h = b.v / mx * H, x = L + i * (bw + gap); s += `<rect x="${x}" y="${top + H - h}" width="${bw}" height="${h}" rx="3" fill="${b.c || 'var(--acc)'}" opacity=".85"/><text x="${x + bw / 2}" y="${top + H - h - 4}" font-size="12" text-anchor="middle">${b.v}</text><text x="${x + bw / 2}" y="${top + H + 16}" font-size="11.5" text-anchor="middle" fill="var(--muted)">${b.lab}</text>`; });
+  bars.forEach((b, i) => { const h = b.v / mx * H, x = L + i * (bw + gap); s += `<rect x="${x}" y="${top + H - h}" width="${bw}" height="${h}" rx="3" fill="${b.c || 'var(--acc)'}" opacity=".85"/><text x="${x + bw / 2}" y="${top + H - h - 4}" font-size="12" text-anchor="middle">${b.v}${o.unit || ''}</text><text x="${x + bw / 2}" y="${top + H + 16}" font-size="11.5" text-anchor="middle" fill="var(--muted)">${b.lab}</text>`; });
   if (o.line != null) { const y = top + H - o.line / mx * H; s += `<line x1="${L - 6}" y1="${y}" x2="${W - 6}" y2="${y}" stroke="var(--good)" stroke-width="2" stroke-dasharray="6 4"/><text x="${W - 8}" y="${y - 5}" font-size="12" text-anchor="end" fill="var(--good)" font-weight="700">${o.lineLab || o.line}</text>`; }
   s += '</svg>';
   return `<div class="fig">${s}</div>` + (o.cap ? `<div class="mcap">${o.cap}</div>` : '');
