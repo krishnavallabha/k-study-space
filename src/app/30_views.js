@@ -47,7 +47,7 @@ V.week = n => {
   let h = `<div class="wrap"><div class="crumb">${link('', c.short)} › Week ${w.n}</div><h1>Week ${w.n} · ${w.title}</h1><p class="reading">${w.blurb}</p>`;
   if (w.note) h += M.box('exam', 'Note', w.note);
   const np = c.qs.filter(q => q.src === 'PYQ' && q.week === w.n).length;
-  h += `<div class="row">${np ? `<a class="btn ghost" href="#/${c.code}/pyq?week=${w.n}">${np} PYQs of this week</a>` : ''}<a class="btn ghost" href="#/${c.code}/bank?week=${w.n}">Practice bank</a><a class="btn" href="#/${c.code}/mock?preset=week&week=${w.n}">Timed week mock</a><a class="btn ghost" href="#/${c.code}/sheets/${w.n}">Revision sheet</a><a class="btn ghost" href="#/${c.code}/cards?week=${w.n}">Flashcards</a></div>`;
+  if (w.topics.length) h += `<div class="row">${np ? `<a class="btn ghost" href="#/${c.code}/pyq?week=${w.n}">${np} PYQs of this week</a>` : ''}<a class="btn ghost" href="#/${c.code}/bank?week=${w.n}">Practice bank</a><a class="btn" href="#/${c.code}/mock?preset=week&week=${w.n}">Timed week mock</a><a class="btn ghost" href="#/${c.code}/sheets/${w.n}">Revision sheet</a><a class="btn ghost" href="#/${c.code}/cards?week=${w.n}">Flashcards</a></div>`;
   w.topics.forEach(t => {
     h += `<h2>${t.title}</h2>`;
     t.cs.forEach(id => { const k = c.cmap[id]; if (!k) return; const s = conceptStats(id), p = c.qs.filter(q => q.src === 'PYQ' && q.cs.includes(id)).length;
