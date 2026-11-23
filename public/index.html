@@ -1141,6 +1141,352 @@ VQ({ kind: 'nearmiss', type: 'mcq', q: 'Halfway through a sprint, the client say
  ['Main advantage of Agile over Waterfall?', 'Accommodates changing requirements.'],
  ['“Over” in the Agile Manifesto means…', 'Valued more — not abandoned.']].forEach(([f, b]) => CARD(f, b, 1));
 
+/* ---- courses/cs3001/w2.js ---- */
+/* ===================== SE WEEK 2 — Software requirements ===================== */
+WEEK({ course: 'cs3001', n: 2, title: 'Software Requirements',
+  blurb: 'Before anything is built, find out what it must do and for whom. Identify primary, secondary and tertiary users; gather requirements with questionnaires, interviews, focus groups, observation and documents; spot ambiguous, inconsistent and incomplete requirements; separate functional from non-functional; write them as an SRS or as user stories, and make each story SMART.',
+  topics: [
+    { title: '2.1 Who are the users, and what can go wrong', cs: ['users'] },
+    { title: '2.2 Gathering requirements', cs: ['gathering'] },
+    { title: '2.3 Classifying and documenting', cs: ['fr-nfr', 'srs'] },
+    { title: '2.4 Agile requirements', cs: ['user-stories', 'smart'] }] });
+
+/* ---------------- 2.1 Users and requirement problems ---------------- */
+C({ id: 'users', week: 2, title: 'Primary, secondary and tertiary users; requirement problems', pri: 'High', prereq: ['clients'],
+  src: 'Revision notes W2 §2.1–2.2 · Study guide ch.2 §2.1–2.2 · PYQs 2023 T1 Q235, 2023 T2 Q4, 2024 T3 Q19, 2025 T2 Q132, Q133',
+  oneLine: 'Primary = frequent direct users; secondary = use it through someone else; tertiary = never use it but are affected. Problems: ambiguous, inconsistent, incomplete.',
+  misShort: 'Calling a courier who is only phoned a “secondary” user, or calling a contradiction “ambiguous”.',
+  intu: R`<p>A florist in Pune builds an app where customers order bouquets.</p>
+<p>The <i>customers</i> tap through it every day.</p>
+<p>A busy executive never opens it; her assistant orders flowers for her.</p>
+<p>When an order comes in, the shop manager <i>phones</i> a courier to collect it. The courier never sees the app.</p>
+<p>Who are the “users”? All three are affected by the app, but in very different ways.</p>
+<p>The question this concept answers: <b>how directly does each person touch the system?</b></p>
+<p>You might think the courier is “not a user at all”. The course says otherwise: the courier is a <b>tertiary</b> user — never touches it, but the app changes their day.</p>`,
+  why: R`<ul><li>The courier/flower-store scenario appears twice almost verbatim (2023 T1 Q235, 2024 T3 Q19). 2023 T2 Q4 asks for the tertiary users of a jewellery app.</li><li>2025 T2 Q132 tests that <i>two</i> groups can both be primary.</li><li>2025 T2 Q133 introduced the requirement-problem family: two stakeholders contradict → <b>inconsistent</b>.</li></ul>`,
+  formal: M.def(M.lines([
+    '<b>Requirement gathering</b> — actively collecting what the system must do from clients and stakeholders.',
+    '<b>Requirement analysis</b> — examining what was gathered for completeness, consistency and absence of ambiguity. Done by a <b>system analyst</b> with the team.',
+    '<b>Primary users</b> — frequent, direct users (sellers on the Amazon Seller Portal).',
+    '<b>Secondary users</b> — do not use it directly; use it through an intermediary (an executive whose assistant places orders).',
+    '<b>Tertiary users</b> — do not use it at all, but are affected by it or influence its purchase (banks settling payments, logistics partners, the advertising department).',
+    '<b>Ambiguous</b> requirement — can be read in more than one way.',
+    '<b>Inconsistent</b> requirements — two requirements directly contradict each other.',
+    '<b>Incomplete</b> requirement — something important is never stated (a case, a user, a condition).']))
+    + '<p><b>In words:</b> primary touches the keyboard, secondary is one step removed, tertiary never touches it but feels the ripple.</p>',
+  vis: M.graph([
+    { id: 'app', t: 'Flower app', x: 260, y: 150, shape: 'circle', w: 110, hl: true },
+    { id: 'p', t: 'Customers\n(primary)', x: 80, y: 60, w: 120 },
+    { id: 'a', t: 'Assistant', x: 80, y: 250, w: 100 },
+    { id: 's', t: 'Executive\n(secondary)', x: 80, y: 340, w: 120 },
+    { id: 'm', t: 'Shop manager', x: 460, y: 60, w: 120 },
+    { id: 't', t: 'Courier\n(tertiary)', x: 460, y: 250, w: 110 }],
+    [{ a: 'p', b: 'app', lab: 'uses directly' }, { a: 'a', b: 'app', lab: 'uses' }, { a: 's', b: 'a', lab: 'asks' }, { a: 'm', b: 'app', lab: 'uses' }, { a: 'm', b: 't', lab: 'phones', dash: true }],
+    { cap: 'Distance from the system decides the type. The courier is only ever reached by phone.', label: 'user types' }),
+  ex: [
+    M.ex('Introductory', R`<p>Customers order bouquets in the app; the store manager phones a courier to pick up and deliver. What type of user is the courier?</p>`,
+      R`<ol><li>Does the courier use the app directly? No.</li><li>Through an intermediary who operates it for them? No — the manager phones them; nobody uses the app on the courier’s behalf.</li><li>Is the courier affected by the app? Yes — every order creates a pickup.</li><li>So: <b>tertiary user</b> (2023 T1 Q235, 2024 T3 Q19).</li></ol>
+<p><b>Now suppose</b> the app is upgraded so couriers log in and accept pickups on their phones. The courier now touches the app directly and often → <b>primary user</b>. Same person, new relationship, new label.</p>`),
+    M.ex('Standard', R`<p>An education platform: professors upload materials, students access content, and an accreditation body occasionally reviews reports generated by the system. Classify all three.</p>`,
+      R`<ul><li>Professors use it directly and frequently → primary.</li><li>Students use it directly and frequently → primary too (two primary groups are allowed).</li><li>The accreditation body reads reports produced by the system; it influences and is affected but does not operate it → tertiary.</li></ul><p>Key of 2025 T2 Q132: Primary, Primary, Tertiary. The decoy makes students “secondary” — but secondary means <i>through an intermediary</i>, not “less important”.</p>`),
+    M.ex('Exam-level', R`<p>Stakeholder A: “Passwords must expire every 30 days.” Stakeholder B: “Users must never be forced to change passwords more than once a year.” A third requirement says: “The system should load quickly.” Name the problem in each.</p>`,
+      R`<ol><li>A vs B cannot both be satisfied → <b>inconsistent</b> (2025 T2 Q133).</li><li>“Quickly” can be read as 1 second or 10 → <b>ambiguous</b>.</li><li>Neither says what happens to accounts that are already older than 30 days → that gap would be <b>incomplete</b>.</li></ol>`)],
+  math: M.rule(R`<p><b>Primary</b> = uses directly and often. <b>Secondary</b> = uses through an intermediary. <b>Tertiary</b> = never uses it, but is affected or influences adoption.</p><p><b>Ambiguous</b> = many readings. <b>Inconsistent</b> = contradiction. <b>Incomplete</b> = missing piece.</p>`)
+    + M.why([['Courier as secondary', 'secondary users have someone operating the system for them; the courier has nobody using the app on their behalf.'],
+      ['Students as secondary because professors upload', 'students use the system directly to access content — primary.'],
+      ['Auditors who access the app twice a year as tertiary', 'they log in and use it themselves; infrequent direct use is not tertiary (2023 T2 Q4 decoy).'],
+      ['Contradiction called ambiguous', 'each requirement alone is perfectly clear; together they clash — inconsistent.'],
+      ['“Implicit” as a requirement problem', 'not one of the course’s three named problems.']]),
+  conn: R`<p><b>At work:</b> product managers write separate personas for each user type; tertiary stakeholders (legal, banks, logistics) often add hard constraints late if they are forgotten.</p>
+<p><b>Earlier:</b> Week 1’s client types (external / internal / software) answer a different question — who the system is built for. The papers mix the two lists on purpose.</p>
+<p><b>Later:</b> the next concept gathers requirements from <i>all</i> of these users; incomplete and ambiguous requirements are exactly what SMART refinement fixes.</p>`,
+  mis: M.ul(['Secondary for the courier (2023 T1 Q235, 2024 T3 Q19).', 'Auditors (who access the app) offered as tertiary users in 2023 T2 Q4 — the jewellers who never use the app are the tertiary users.', '“Students – Secondary users” (2025 T2 Q132).', '“Ambiguous” or “Implicit” for two contradicting stakeholders (2025 T2 Q133).']),
+  exam: R`<p><b>Fast method:</b> for each person ask “do they press the buttons themselves?”</p><ul><li>Yes, regularly → primary.</li><li>No, someone presses them on their behalf → secondary.</li><li>No, and nobody does it for them, but the system still affects them → tertiary.</li></ul><p>For requirement problems: one requirement with two readings → ambiguous; two requirements that fight → inconsistent; something never said → incomplete.</p>`
+});
+Q({ cp: 'users', type: 'mcq', diff: 'easy', q: 'A hospital’s billing system sends claims to insurance companies; insurers never log in, but their payouts depend on it. Insurers are:', opts: ['Primary users', 'Secondary users', 'Tertiary users', 'Software clients'], ans: 2,
+  why: ['They do not use the system directly.', 'Nobody operates it on their behalf.', 'Correct: affected without using it.', 'The insurers here are organisations of people; the question is about user type.'], sol: 'Never use it + affected → tertiary.' });
+Q({ cp: 'users', type: 'mcq', diff: 'moderate', q: 'A CEO never opens the travel-booking tool; her secretary books all her trips in it. The CEO is a:', opts: ['Primary user', 'Secondary user', 'Tertiary user', 'Not a user'], ans: 1,
+  why: ['She never uses it directly.', 'Correct: uses it through an intermediary.', 'Tertiary users have nobody using it for them.', 'The system is used on her behalf.'], sol: 'Through an intermediary → secondary.' });
+Q({ cp: 'users', type: 'mcq', diff: 'moderate', q: '“The report should be generated in a suitable format.” The main problem with this requirement is that it is:', opts: ['Inconsistent', 'Ambiguous', 'Incomplete', 'Non-functional'], ans: 1,
+  why: ['Nothing contradicts it.', 'Correct: “suitable” can be read many ways.', 'It is stated; it is just vague.', 'Classification is a separate question from the defect.'], sol: 'Vague word with many readings → ambiguous.' });
+Q({ cp: 'users', type: 'short', diff: 'moderate', q: 'Explain the difference between a secondary and a tertiary user with one example of each.',
+  model: '<p>A <b>secondary</b> user does not operate the system but uses it through an intermediary — e.g. an executive whose assistant places orders for her.</p><p>A <b>tertiary</b> user does not use the system at all, even indirectly, but is affected by it or influences its adoption — e.g. a courier who is phoned to deliver an order placed on a flower app, or a bank settling the payments.</p>' });
+
+/* ---------------- 2.2 Gathering techniques ---------------- */
+C({ id: 'gathering', week: 2, title: 'Requirement-gathering techniques', pri: 'High', prereq: ['users'],
+  src: 'Revision notes W2 §2.3 · Study guide ch.2 §2.3 · PYQs 2023 T1 Q236, 2023 T2 Q5, 2023 T3 Q179, 2024 T1 Q25, 2024 T2 Q4, 2024 T3 Q20, 2025 T1 Q23, Q39, 2025 T2 Q135, 2025 T3 Q6, 2026 T1 Q6, 2026 T2 Q2',
+  oneLine: 'Questionnaire = specific questions to many; interview (structured / semi / unstructured) = depth; focus group = many viewpoints, consensus and conflict; observation = real context; documentation = rules and procedures.',
+  misShort: 'Calling a fixed list of questions asked aloud to everyone a “questionnaire” instead of a structured interview.',
+  intu: R`<p>You are asked to build a payroll system for 500 companies.</p>
+<p>You could post a form to all 500 HR managers. Fast and cheap — but you only learn what you thought to ask.</p>
+<p>You could sit down with five managers and talk for an hour each. Slow — but you hear the problems you never imagined.</p>
+<p>You could put eight managers in a room and let them argue. You learn where they agree, and where they clash.</p>
+<p>You could sit beside a payroll clerk on salary day and just watch.</p>
+<p>Or you could read the labour laws and the company’s salary policy.</p>
+<p>The question: <b>which technique is the story describing?</b> The exam gives you one verb — “sent”, “asked aloud”, “discussed as a group”, “visited and watched”, “read the rules” — and that verb is the answer.</p>`,
+  why: R`<ul><li>The largest Week 2 family: twelve questions across ten papers.</li><li>Documentation alone was keyed four times (2023 T1, 2025 T1, 2025 T2 and in the 2024 T1 match).</li><li>The interview flavours are the newest twist: structured (2024 T2, 2026 T2), unstructured (2025 T1).</li></ul>`,
+  formal: M.def(M.lines([
+    '<b>Questionnaire</b> — a list of specific, well-defined questions sent to a large group. Fast, cheap, no follow-up; misses hidden requirements.',
+    '<b>Interview</b> — talking to stakeholders to explore issues in depth. <i>Structured</i>: fixed questions, same order, same for everyone. <i>Unstructured</i>: open-ended, follow-ups adapt to answers. <i>Semi-structured</i>: a fixed base plus free follow-ups.',
+    '<b>Focus group / workshop</b> — a group of stakeholders discussing together; collects multiple viewpoints and surfaces both consensus and conflict.',
+    '<b>Naturalistic observation</b> — watching people do the task in their real setting, to understand context and unspoken behaviour.',
+    '<b>Documentation</b> — reading existing procedures, rules, regulations and standards.',
+    'Guidelines: focus on actual needs, involve all user types, combine techniques, run a pilot first, be pragmatic about cost.']))
+    + '<p><b>In words:</b> many people + specific questions → questionnaire; depth with one person → interview; a group → focus group; watch → observation; read → documentation.</p>',
+  vis: M.table(['Technique', 'Best for', 'Giveaway verb in the stem'], [['Questionnaire', 'Specific questions, large/distributed group', '“sent a list”, “thousands of sellers”'], ['Interview', 'Exploring issues in depth', '“sat down with”, “asked”'], ['Focus group', 'Multiple viewpoints, consensus and conflict', '“group discussion”, “workshop”'], ['Naturalistic observation', 'Understanding the real context', '“visited”, “watched”, “observed”'], ['Documentation', 'Procedures, rules, regulations', '“went through documents / policies / FAQs”']], 'The verb decides the technique.')
+    + M.ladder([{ t: 'Structured interview', d: 'fixed list, same order, everyone' }, { t: 'Semi-structured', d: 'fixed base + free follow-ups' }, { t: 'Unstructured interview', d: 'open-ended, adapts to answers' }], { top: 'rigid', bottom: 'free', cap: 'The interview flavours, from most scripted to least.' }),
+  ex: [
+    M.ex('Introductory', R`<p>An analyst prepares a fixed list of 25 questions and <i>verbally</i> asks exactly the same questions to HR managers of every company. Which technique?</p>`,
+      R`<ol><li>Verbally asked → an interview, not a form.</li><li>Fixed list, same questions, everyone → <b>structured interview</b> (2026 T2 Q2, also 2024 T2 Q4).</li></ol>
+<p><b>Now suppose</b> the analyst starts from the same 25 questions but follows up freely on interesting answers → <b>semi-structured</b>. And if there is no list at all and the conversation flows → <b>unstructured</b> (2025 T1 Q23).</p>
+<p><b>Now suppose</b> the 25 questions are emailed as a form to all 500 managers → <b>questionnaire</b>. The medium (spoken vs sent) and the script decide it.</p>`),
+    M.ex('Standard', R`<p>Match: A. Interviews, B. Focus groups, C. Naturalistic observations, D. Documentation — with 1. collect multiple viewpoints, 2. understand procedures, regulations and standards, 3. explore issues, 4. understand the context.</p>`,
+      R`<p>A–3 (explore), B–1 (multiple viewpoints), C–4 (context), D–2 (procedures). This is the 2024 T1 Q25 key. The near-miss options swap A and B, or C and D.</p>`),
+    M.ex('Exam-level', R`<p>For a sales-summary module, mobile sales teams care about launch-day sales and furniture teams about 30-day trends. Why run focus groups with managers from different industries? Select all: (a) gain consensus on common requirements (b) highlight conflicts between stakeholder needs (c) observe how users work in their natural setting (d) get detailed regulatory information from banks.</p>`,
+      R`<p>(a) ✔ and (b) ✔ — a focus group surfaces both agreement and disagreement. (c) is naturalistic observation; (d) is documentation. Answer (a), (b) — 2025 T3 Q6.</p>`)],
+  math: M.rule(R`<p><b>Specific questions × many people → Questionnaire. Depth → Interview (structured / semi / unstructured). Group → Focus group. Watch → Naturalistic observation. Read rules → Documentation.</b></p>`)
+    + M.why([['Questionnaire for questions asked aloud', 'a questionnaire is sent and filled in; spoken questions make it an interview.'],
+      ['Interviews for thousands of distributed sellers', 'too slow and costly; specific questions to many → questionnaire (2026 T1 Q6).'],
+      ['Observation for reading banking policies and competitor FAQs', 'reading documents is documentation (2025 T2 Q135).'],
+      ['Focus group for visiting grocery shops to watch customers', 'watching in the real setting is naturalistic observation (2023 T3 Q179).'],
+      ['Semi-structured for “exactly the same questions”', 'no follow-ups → structured.']]),
+  conn: R`<p><b>At work:</b> UX researchers combine a survey (questionnaire) for breadth with five interviews for depth, then shadow users (observation) — exactly the “combine techniques” guideline.</p><p><b>Earlier:</b> you must reach primary, secondary <i>and</i> tertiary users.</p><p><b>Later:</b> what you gather is classified (functional / non-functional) and written as an SRS or user stories.</p>`,
+  mis: M.ul(['“Questionnaires” as a decoy for a structured interview (2024 T2 Q4 lists it as an option).', '“Interviews” for a fixed set of questions to a large group (2023 T2 Q5, 2024 T3 Q20 — key is questionnaires).', '“Focus groups” for reading rules (2023 T1 Q236 — documentation).', 'Picking “observe users in their natural setting” as a reason for focus groups (2025 T3 Q6).']),
+  exam: R`<p><b>Fast method:</b> circle the verb and the audience.</p><ul><li>Sent + many → questionnaire.</li><li>Asked in person → interview; then decide the script (fixed / partly / none).</li><li>Group discussing → focus group.</li><li>Visited / watched → naturalistic observation.</li><li>Read documents / policies / regulations → documentation.</li></ul>`
+});
+Q({ cp: 'gathering', type: 'mcq', diff: 'easy', q: 'A team spends two days at a pharmacy watching how pharmacists check prescriptions and fetch medicines. Technique?', opts: ['Questionnaire', 'Focus group', 'Naturalistic observation', 'Documentation'], ans: 2,
+  why: ['No questions are sent.', 'No group discussion.', 'Correct: watching in the real setting.', 'No documents are read.'], sol: 'Watch → observation.' });
+Q({ cp: 'gathering', type: 'mcq', diff: 'moderate', q: 'An analyst begins each interview with the same 10 questions but asks follow-ups based on each answer. This is a:', opts: ['Structured interview', 'Semi-structured interview', 'Unstructured interview', 'Questionnaire'], ans: 1,
+  why: ['Structured has no follow-ups.', 'Correct: fixed base + free follow-ups.', 'Unstructured has no fixed base.', 'Spoken, not sent.'], sol: 'Fixed base + follow-ups → semi-structured.' });
+Q({ cp: 'gathering', type: 'msq', diff: 'hard', q: 'Select ALL weaknesses of relying <b>only</b> on questionnaires.', opts: ['Limited to the questions you thought of in advance', 'No follow-up on interesting answers', 'Cannot reach large audiences', 'Can miss hidden requirements'], ans: [0, 1, 3],
+  why: ['Correct.', 'Correct.', 'False — reaching many people is its strength.', 'Correct.'], sol: 'Questionnaires are broad but shallow.' });
+Q({ cp: 'gathering', type: 'short', diff: 'moderate', q: 'Why does the course recommend focus groups in addition to one-on-one interviews?',
+  model: '<p>One interview captures one person’s perspective. A focus group brings several stakeholders together, so you collect multiple viewpoints at once and see where they agree (consensus) and where they conflict — which individual interviews would hide.</p>' });
+
+/* ---------------- 2.3 Functional vs non-functional ---------------- */
+C({ id: 'fr-nfr', week: 2, title: 'Functional vs non-functional requirements', pri: 'High', prereq: ['gathering'],
+  src: 'Revision notes W2 §2.4 · Study guide ch.2 §2.4 · PYQs 2024 T1 Q24, 2024 T2 Q5, 2024 T3 Q4, 2025 T1 Q37, 2025 T3 Q7, 2026 T1 Q25, 2026 T2 Q11',
+  oneLine: 'Functional = WHAT the system does (input → output). Non-functional = HOW WELL (time, load, uptime, reliability, robustness, security, portability).',
+  misShort: 'Calling “must process payments within 3 seconds” functional because it mentions a feature.',
+  intu: R`<p>Two requirements for an exam portal.</p>
+<p>“Students shall be able to submit answers online.”</p>
+<p>“The system shall save each submission within 2 seconds.”</p>
+<p>The first describes something the system <i>does</i>. Without it, there is no exam portal.</p>
+<p>The second describes <i>how well</i> it does it. Without it, the portal still works — just slowly.</p>
+<p>The question: <b>is a requirement about a capability, or about a quality of that capability?</b></p>
+<p>You might think anything mentioning “payments” or “search” is functional. The trap: “process payments <i>within 3 seconds</i>” is about speed — non-functional.</p>`,
+  why: R`<ul><li>Seven papers. The two-requirement version (2024 T2, 2024 T3, 2025 T3, 2026 T2) and the four-requirement version (2024 T1, 2025 T1) both recur.</li><li>2026 T1 Q25 turned it into an MSQ including reliability (“behave consistently over time”) and robustness (“recover from invalid input”).</li></ul>`,
+  formal: M.def(M.lines([
+    '<b>Functional requirement</b> — what the system does: a capability or feature; a mapping from input to output. Verified by a pass/fail functional test.',
+    '<b>Non-functional requirement</b> — how well the system behaves: a quality attribute or constraint. Verified by measuring (seconds, users, uptime %).',
+    'Named non-functional categories: <b>Reliability</b>, <b>Robustness</b>, <b>Performance</b>, <b>Portability</b>, <b>Security</b>.',
+    '<b>Reliability</b> — behaves the same way over time in the same environment.',
+    '<b>Robustness</b> — recovers from errors or unexpected input without crashing or producing garbage.']))
+    + '<p><b>In words:</b> functional = a verb the system performs; non-functional = an adverb or number describing that performance.</p>',
+  vis: M.table(['Requirement', 'Type', 'Why'], [['A seller can add, edit and delete catalogue items', 'Functional', 'a capability'], ['New products appear within 5 seconds', 'Non-functional', 'a time limit'], ['Support at least 500 simultaneous logins', 'Non-functional', 'a load figure'], ['Notify the user when an appointment is booked', 'Functional', 'an action'], ['Behave consistently over time', 'Non-functional', 'reliability'], ['Recover from invalid input', 'Non-functional', 'robustness']], 'Numbers, time limits, loads and qualities → non-functional.'),
+  ex: [
+    M.ex('Introductory', R`<p>R1: Students shall be able to submit answers online. R2: The system shall process and save submissions within 2 seconds.</p>`,
+      R`<ol><li>R1 — an action the system performs → functional.</li><li>R2 — a time limit on that action → non-functional.</li><li>Answer: R1 functional, R2 non-functional (2026 T2 Q11).</li></ol>
+<p><b>Now suppose</b> R2 is reworded to “The system shall save each submission.” The time limit is gone; it is now a capability → functional. <b>The mechanism:</b> the number is what moved it to non-functional.</p>`),
+    M.ex('Standard', R`<p>Clinic app: (1) support at least 500 simultaneous logins; (2) let users view doctors and slots; (3) notify users when an appointment is booked; (4) process payments within 3 seconds.</p>`,
+      R`<p>(2) and (3) are actions → functional. (1) is a load figure and (4) a time limit → non-functional. Key: “2 and 3 functional, 1 and 4 non-functional” (2025 T1 Q37; 2024 T1 Q24 is the grocery twin).</p><p>Trap: (3) “notify” and (4) “process payments” both sound like features; only (4) carries a number.</p>`),
+    M.ex('Exam-level', R`<p>Select ALL non-functional: (a) display new products within 5 seconds (b) behave consistently over time (c) the seller can update product prices (d) recover from invalid input (e) the portal must run on Android and iOS.</p>`,
+      R`<p>(a) performance, (b) reliability, (d) robustness, (e) portability → non-functional. (c) is a capability → functional. Answer (a), (b), (d), (e). 2026 T1 Q25 had (a), (b), (d); (e) is the extra Spartan item.</p>`)],
+  math: M.rule(R`<p><b>Functional = WHAT (capability, f : input → output).</b></p><p><b>Non-functional = HOW WELL (performance, reliability, robustness, portability, security) — usually carries a number.</b></p>`)
+    + M.why([['“Within 2 seconds” as functional', 'it limits how fast, not what — non-functional.'], ['“Support 100 simultaneous requests” as functional', 'a load figure is a performance constraint.'], ['“Generate the invoice” as non-functional', 'generating an invoice is a capability; only “within a second” makes requirement 4 non-functional.'], ['Reliability vs robustness swapped', 'reliability = same behaviour over time; robustness = survives bad input.']]),
+  conn: R`<p><b>At work:</b> non-functional requirements become SLAs (“99.9% uptime”, “p95 latency under 300 ms”) and are tested with load tests; functional ones become feature tickets with acceptance tests.</p><p><b>Earlier:</b> gathering produces raw statements; this step classifies them.</p><p><b>Later:</b> the SRS lists both classes separately; the “Measurable” in SMART is often what turns a vague wish into a non-functional requirement.</p>`,
+  mis: M.ul(['“Requirements 1, 2, 3 functional” when 1 is a load figure (2024 T1 Q24, 2025 T1 Q37).', 'Requirement 2 as functional because it is about “downloading a marksheet” when it says “within 30 seconds” (2024 T3 Q4).', 'Missing “behave consistently over time” as non-functional (2026 T1 Q25).']),
+  exam: R`<p><b>Fast method:</b> look for a number, time limit, load, percentage or quality word (reliable, robust, secure, portable). If present → non-functional. If the sentence is only an action → functional. Then find the option with your exact split.</p>`
+});
+Q({ cp: 'fr-nfr', type: 'mcq', diff: 'easy', q: '“The app must allow users to reset their password via email.” This is:', opts: ['Functional', 'Non-functional (performance)', 'Non-functional (security)', 'Not a requirement'], ans: 0,
+  why: ['Correct: a capability.', 'No time or load constraint.', 'It is a feature, even if security-related.', 'It is a requirement.'], sol: 'Action without a number → functional.' });
+Q({ cp: 'fr-nfr', type: 'msq', diff: 'moderate', q: 'Select ALL non-functional requirements.', opts: ['99.9% uptime per month', 'Managers can approve leave requests', 'Pages load within 2 seconds on 4G', 'Works on Chrome, Firefox and Safari'], ans: [0, 2, 3],
+  why: ['Reliability/availability figure.', 'An action — functional.', 'Performance.', 'Portability.'], sol: 'Numbers and qualities → non-functional.' });
+Q({ cp: 'fr-nfr', type: 'mcq', diff: 'moderate', q: '“When a user enters letters in the phone-number field, the app shows a message and keeps running.” Which quality is this?', opts: ['Reliability', 'Robustness', 'Portability', 'Functional requirement only'], ans: 1,
+  why: ['Reliability = consistent behaviour over time.', 'Correct: survives unexpected input.', 'Portability = runs on other platforms.', 'It describes how well the system copes, a quality.'], sol: 'Recover from bad input → robustness.' });
+Q({ cp: 'fr-nfr', type: 'short', diff: 'easy', q: 'Define reliability and robustness and give one requirement sentence for each.',
+  model: '<p><b>Reliability:</b> the system behaves the same way over time in the same environment — “The billing job must produce identical totals every night for the same data.”</p><p><b>Robustness:</b> the system recovers from errors or unexpected input without crashing — “If a CSV row is malformed, the importer must skip it and report it, not crash.”</p>' });
+
+/* ---------------- 2.3 SRS ---------------- */
+C({ id: 'srs', week: 2, title: 'The Software Requirements Specification (SRS)', pri: 'Supporting', prereq: ['fr-nfr'],
+  src: 'Revision notes W2 §2.5 · Study guide ch.2 §2.5 · PYQ 2023 T3 Q180',
+  oneLine: 'A formal document of all requirements, clear to technical and non-technical readers; great when requirements are fixed, heavy when they keep changing.',
+  misShort: 'Choosing “write it in technical language for precision” or “keep it vague for flexibility”.',
+  intu: R`<p>A hospital and a software vendor sign a contract.</p>
+<p>Six months later they argue: “We said reports must be exportable!” “No, you didn’t!”</p>
+<p>Who is right? Without a written, agreed list of requirements, nobody can tell.</p>
+<p>The <b>SRS</b> is that list. Both sides read it, both sides sign it.</p>
+<p>The question: <b>what goes in it, and how should it be written?</b></p>
+<p>You might think it should be full of technical precision. But the hospital’s administrators must understand it too. The goal is clarity for <i>everyone</i>.</p>`,
+  why: R`<ul><li>2023 T3 Q180 asked the primary focus regarding clarity: clear, unambiguous, understandable by technical and non-technical stakeholders.</li><li>The SRS’s drawback (heavy up-front documents) is the bridge to user stories, the most tested Week 2 idea.</li></ul>`,
+  formal: M.def(M.lines([
+    '<b>SRS</b> — a formal document organising all the system’s requirements, produced by the system analyst with the team.',
+    'Contents (4): broad outline and system description; functional and non-functional requirements; external interface requirements (user, hardware, software, communication interfaces); system features.',
+    'Advantages: a formal agreement between customer and developer; reduces rework; basis for cost and schedule estimation; makes future extensions easier.',
+    'Drawback: large up-front documentation — good when requirements are fixed, poor when they evolve.']))
+    + '<p><b>In words:</b> the SRS is the signed shopping list of the project.</p>',
+  vis: M.flow(['Gather', 'Analyse', { t: 'SRS', sub: 'signed by both', hl: true }, 'Estimate cost & schedule', 'Design'], { cap: 'The SRS sits between analysis and everything that is planned from it.' }),
+  ex: [
+    M.ex('Introductory', R`<p>What should be the primary focus regarding the clarity of requirements in an SRS? (a) technical language for precision (b) ambiguous language for flexibility (c) clear, unambiguous, understandable by technical and non-technical stakeholders (d) only high-level requirements.</p>`,
+      R`<p><b>(c)</b> (2023 T3 Q180). (a) shuts out non-technical readers; (b) invites disputes; (d) leaves the document incomplete.</p><p><b>Now suppose</b> the client’s requirements change every two weeks. A huge SRS would be rewritten constantly — that is the drawback, and the reason Agile teams use user stories instead.</p>`),
+    M.ex('Standard', R`<p>Name the four parts of an SRS.</p>`, R`<ol><li>Outline and system description.</li><li>Functional and non-functional requirements.</li><li>External interface requirements (user, hardware, software, communication).</li><li>System features.</li></ol>`),
+    M.ex('Exam-level', R`<p>Which is <b>NOT</b> an advantage of maintaining an SRS? (a) formal agreement (b) basis for cost estimation (c) reduces future rework (d) lets requirements change freely mid-sprint without paperwork.</p>`,
+      R`<p><b>(d)</b> — that is the strength of user stories; an SRS is heavy to change. The other three are the listed advantages.</p>`)],
+  math: M.rule('<p><b>SRS = formal, complete, clear-to-everyone list of requirements. Strength: agreement and estimation. Weakness: heavy when requirements change.</b></p>')
+    + M.why([['Technical jargon for precision', 'non-technical stakeholders must understand it.'], ['Vague wording for flexibility', 'vagueness is the “ambiguous” defect.'], ['High-level only', 'that is incomplete.']]),
+  conn: R`<p><b>At work:</b> tenders and regulated projects still require SRS-style documents (IEEE 830 style).</p><p><b>Earlier:</b> the SRS records the functional and non-functional requirements you classified.</p><p><b>Later:</b> COCOMO estimates (Week 4) start from the size implied by the SRS; Agile replaces it with a backlog of user stories.</p>`,
+  mis: M.ul(['“Write requirements in a technical language to ensure precision” (2023 T3 Q180 decoy).', '“Use ambiguous language to allow flexibility” (same paper).']),
+  exam: R`<p><b>Fast method:</b> any option that excludes a group of readers, or makes requirements less precise, is wrong.</p>`
+});
+Q({ cp: 'srs', type: 'mcq', diff: 'easy', q: 'Which is part of an SRS?', opts: ['External interface requirements', 'The source code', 'Sprint retrospective notes', 'The Gantt chart'], ans: 0,
+  why: ['Correct.', 'Code is written later.', 'Retrospectives belong to Scrum.', 'Schedules are built from the SRS, not inside it.'], sol: 'Four parts: outline, F/NF requirements, external interfaces, features.' });
+Q({ cp: 'srs', type: 'mcq', diff: 'moderate', q: 'The main drawback of the SRS approach is:', opts: ['It cannot record non-functional requirements', 'Large up-front documentation that suits fixed requirements but not evolving ones', 'It is not understood by developers', 'It replaces testing'], ans: 1,
+  why: ['It records both classes.', 'Correct.', 'It is written for both technical and non-technical readers.', 'It does not.'], sol: 'Heavy when requirements change → Agile pivot.' });
+Q({ cp: 'srs', type: 'mcq', diff: 'moderate', q: 'Which advantage of an SRS helps a manager produce a COCOMO estimate?', opts: ['It is a basis for cost and schedule estimation', 'It removes the need for design', 'It guarantees no requirement changes', 'It contains velocity data'], ans: 0,
+  why: ['Correct.', 'Design is still needed.', 'Nothing guarantees that.', 'Velocity is Agile data.'], sol: 'Estimation starts from the documented requirements.' });
+Q({ cp: 'srs', type: 'short', diff: 'easy', q: 'List three advantages and one drawback of an SRS.',
+  model: '<p>Advantages: formal agreement between customers and developers; reduces future rework because ambiguity is resolved before coding; basis for cost and schedule estimation (also: eases future extensions).</p><p>Drawback: large up-front documentation, which works when requirements are fixed but becomes a burden when they keep changing.</p>' });
+
+/* ---------------- 2.4 User stories & BDD ---------------- */
+C({ id: 'user-stories', week: 2, title: 'Behaviour-driven design and user stories', pri: 'Medium', prereq: ['srs'],
+  src: 'Revision notes W2 §2.6 · Study guide ch.2 §2.6 · PYQs 2023 T3 Q178, 2026 T1 Q7',
+  oneLine: 'As a [role], I want [feature], so that [benefit] — the Role–Feature–Benefit template; a promise for a conversation, sized for one sprint.',
+  misShort: 'Picking “Feature–Role–Time” or “Input–Process–Output” as the template.',
+  intu: R`<p>A seller on a marketplace says: “I want to see my reviews.”</p>
+<p>Why? “So that I can improve what I stock.”</p>
+<p>That one breath contains <i>who</i> wants something, <i>what</i> they want, and <i>why</i>.</p>
+<p>Write it down on a card: “As a seller, I want to view product reviews, so that I can improve my inventory.”</p>
+<p>That card is a <b>user story</b>. It is not a full specification. It is a reminder to have a conversation.</p>
+<p>The question: <b>how do Agile teams write requirements, and what is the exact template?</b></p>`,
+  why: R`<ul><li>2026 T1 Q7: the correct BDD template is Role–Feature–Benefit.</li><li>2023 T3 Q178: user stories express requirements from the end-user’s perspective.</li><li>Every SMART question (next concept, nine papers) is built on a user story.</li></ul>`,
+  formal: M.def(M.lines([
+    '<b>BDD (behaviour-driven design)</b> — keep asking questions about the application’s behaviour before and during development; refine requirements continuously; write them as user stories.',
+    '<b>User story</b> — a short, informal, plain-language description of something a user wants that has value to them; the smallest unit of work that fits in one sprint.',
+    '<b>Template (Role–Feature–Benefit)</b> — As a [type of user], I want [an action], so that [a benefit].',
+    'Benefits: lightweight; helps plan and prioritise; focuses on behaviour, not implementation; starts a conversation.',
+    'Drawbacks: needs continuous access to users; does not scale well to very large or safety-critical projects.']))
+    + '<p><b>In words:</b> who, what, why — on one card.</p>',
+  vis: M.graph([{ id: 'r', t: 'As a seller,', x: 110, y: 40, w: 160 }, { id: 'f', t: 'I want to view\nproduct reviews,', x: 110, y: 120, w: 160 }, { id: 'b', t: 'so that I can\nimprove my inventory.', x: 110, y: 210, w: 180 },
+    { id: 'R', t: 'ROLE', x: 330, y: 40, w: 90, fill: 'var(--acc2)' }, { id: 'F', t: 'FEATURE', x: 330, y: 120, w: 90, fill: 'var(--acc2)' }, { id: 'B', t: 'BENEFIT', x: 330, y: 210, w: 90, fill: 'var(--acc2)' }],
+    [{ a: 'r', b: 'R', noArrow: true, dash: true }, { a: 'f', b: 'F', noArrow: true, dash: true }, { a: 'b', b: 'B', noArrow: true, dash: true }], { cap: 'Role – Feature – Benefit.' }),
+  ex: [
+    M.ex('Introductory', R`<p>Rewrite “The system shall allow librarians to scan library cards to retrieve user details” as a user story.</p>`,
+      R`<p>As a librarian, I want to scan library cards, so that I can retrieve the users’ details.</p><ol><li>Role: librarian.</li><li>Feature: scan cards.</li><li>Benefit: retrieve details.</li></ol><p><b>Now suppose</b> the benefit is left out: “As a librarian, I want to scan cards.” It is still a feature request, but the team loses the <i>why</i> — and with it the ability to judge relevance or find a better solution. The benefit clause is not decoration.</p>`),
+    M.ex('Standard', R`<p>Which is the correct BDD user-story template? (a) Feature–Role–Time (b) Input–Process–Output (c) Role–Feature–Benefit (d) Task–Module–Deadline.</p>`, R`<p><b>(c)</b> (2026 T1 Q7). (b) is the functional-requirement mapping idea; (a) and (d) are invented.</p>`),
+    M.ex('Exam-level', R`<p>A regulated aircraft-software project with 400 engineers wants to replace its SRS with user stories only. Give the two course-listed drawbacks that apply.</p>`,
+      R`<ol><li>Continuous contact with users is often impossible for such a project.</li><li>User stories do not scale to very large or safety-critical projects.</li></ol>`)],
+  math: M.rule('<p><b>As a [role], I want [feature], so that [benefit].</b> A user story = the end-user’s perspective, small enough for one sprint, a promise for a conversation.</p>')
+    + M.why([['A user story is a detailed description of code structure', 'it describes behaviour, not implementation.'], ['A list of tasks assigned to developers', 'tasks come from stories; the story is the user’s need.'], ['Input–Process–Output', 'that is the functional “f : I → O” view, not the story template.']]),
+  conn: R`<p><b>At work:</b> Jira “Story” tickets use exactly this template, plus acceptance criteria.</p><p><b>Earlier:</b> stories are the Agile replacement for a heavy SRS.</p><p><b>Later:</b> SMART makes each story testable and sprint-sized; Week 4 assigns story points and measures velocity.</p>`,
+  mis: M.ul(['“Feature–Role–Time” and “Input–Process–Output” (2026 T1 Q7).', '“A form of documentation used for project management” and “a list of tasks” (2023 T3 Q178).']),
+  exam: R`<p><b>Fast method:</b> the template always starts with a <i>role</i> and ends with a <i>benefit</i>. Any other order or content is a decoy.</p>`
+});
+Q({ cp: 'user-stories', type: 'mcq', diff: 'easy', q: 'In “As a buyer, I want to save items to a wishlist, so that I can buy them later”, the benefit is:', opts: ['buyer', 'save items to a wishlist', 'buy them later', 'the wishlist'], ans: 2,
+  why: ['That is the role.', 'That is the feature.', 'Correct: the “so that” clause.', 'Part of the feature.'], sol: 'Benefit = “so that …”.' });
+Q({ cp: 'user-stories', type: 'mcq', diff: 'moderate', q: 'BDD primarily means:', opts: ['Writing all code before any requirements', 'Asking questions about the application’s behaviour before and during development and expressing requirements as user stories', 'Designing the database first', 'Testing only after release'], ans: 1,
+  why: ['Backwards.', 'Correct.', 'Not related.', 'Not related.'], sol: 'Behaviour-driven: behaviour questions → user stories, refined continuously.' });
+Q({ cp: 'user-stories', type: 'msq', diff: 'moderate', q: 'Select ALL listed benefits of user stories.', opts: ['Lightweight', 'Help plan and prioritise', 'Scale well to safety-critical systems', 'Focus on behaviour rather than implementation'], ans: [0, 1, 3],
+  why: ['Benefit.', 'Benefit.', 'That is a listed drawback.', 'Benefit.'], sol: 'Drawbacks: need user access; poor for very large/safety-critical projects.' });
+Q({ cp: 'user-stories', type: 'short', diff: 'easy', q: 'Write a user story for a student who wants to download their marksheet, and label its three parts.',
+  model: '<p>“As a <b>student</b> (role), I want to <b>download my marksheet as a PDF</b> (feature), so that <b>I can submit it with job applications</b> (benefit).”</p>' });
+
+/* ---------------- 2.4 SMART ---------------- */
+C({ id: 'smart', week: 2, title: 'SMART user stories', pri: 'High', prereq: ['user-stories'],
+  src: 'Revision notes W2 §2.6 SMART · Study guide ch.2 §2.6.4 · PYQs 2023 T1 Q237, 2023 T2 Q15, 2024 T1 Q29, 2024 T2 Q15, 2024 T3 Q21, 2025 T1 Q33, 2025 T2 Q136, 2025 T3 Q8, 2026 T2 Q12',
+  oneLine: 'Specific (one reading), Measurable (a number to check), Achievable (fits one iteration — split it), Relevant (business value), Timeboxed (stop/split when time runs out).',
+  misShort: 'Choosing Timeboxed when a too-big story is split up front — that is Achievable.',
+  intu: R`<p>A user story says: “I want to search a medicine, so that I get a list of brand names.”</p>
+<p>Search by what? Name? Symptom? Two developers would build two different things.</p>
+<p>Fix it: “search a medicine <i>by its generic name</i>”. Now there is one reading. That is <b>Specific</b>.</p>
+<p>Another story says results should come “within a reasonable time”. Is 6 seconds reasonable? Nobody can test that.</p>
+<p>Fix it: “within 1 second”. Now a test can pass or fail. That is <b>Measurable</b>.</p>
+<p>A third story — “search the catalogue and place an order” — will not fit in one two-week sprint.</p>
+<p>Fix it: split into “search catalogue” and “place order”. That is <b>Achievable</b>.</p>
+<p>The question: <b>which SMART letter does a given refinement improve?</b> Each letter has its own signature change.</p>`,
+  why: R`<ul><li>Asked in nine of the eleven papers — the most reliable Week 2 marks.</li><li>Measurable (“reasonable time” → a number) is keyed four times; Achievable (split into smaller stories) three times; Specific and Time-boxed once each.</li></ul>`,
+  formal: M.def(M.lines([
+    '<b>Specific</b> — no ambiguity; one reading. <i>Signature:</i> adds a qualifier (“by its generic name”, “by title”).',
+    '<b>Measurable</b> — known, verifiable expected results. <i>Signature:</i> a vague word becomes a number (“reasonable time” → “within 4 seconds”, “refresh every 15 seconds”).',
+    '<b>Achievable</b> — can be implemented in one Agile iteration. <i>Signature:</i> a big story is subdivided into smaller ones.',
+    '<b>Relevant</b> — has real business value. <i>Signature:</i> asking “why / so what?”.',
+    '<b>Timeboxed</b> — stop, split or reschedule when the allotted time runs out. <i>Signature:</i> a deadline/timeframe, or stopping work that is overrunning.']))
+    + '<p><b>In words:</b> clear, checkable, sprint-sized, worth doing, and bounded in time.</p>',
+  vis: M.table(['Before', 'After', 'Letter'], [['search a medicine', 'search a medicine <b>by its generic name</b>', 'Specific'], ['within a reasonable time', '<b>within 4 seconds</b>', 'Measurable'], ['search catalogue and place order (too big)', '<b>1a: search catalogue · 1b: place order</b>', 'Achievable'], ['bundle suggestions (no deadline)', '<b>deliver in this sprint</b>', 'Timeboxed'], ['add a feature nobody needs', 'ask <b>why</b>; drop if no value', 'Relevant']], 'Each letter has a signature edit.'),
+  ex: [
+    M.ex('Introductory', R`<p>“…so that I can retrieve the users’ details within a reasonable time” is changed to “…within a second”. Which property improves?</p>`,
+      R`<ol><li>What changed? A vague phrase became a number.</li><li>Can a tester now pass/fail it? Yes.</li><li>So: <b>Measurable</b> (2023 T2 Q15; same as 2024 T2 Q15, 2025 T3 Q8, 2026 T2 Q12).</li></ol>
+<p><b>Now suppose</b> the change had been “I want to scan library cards” → “I want to scan the <i>barcode on</i> library cards”. No number appears; the meaning narrows → <b>Specific</b>. <b>The mechanism:</b> adding a number = Measurable; adding a qualifier = Specific.</p>`),
+    M.ex('Standard', R`<p>A story cannot be completed in one Agile iteration, so it is subdivided into smaller stories. This makes it…</p>`,
+      R`<p><b>Achievable</b> (2023 T1 Q237, 2024 T3 Q21, 2025 T1 Q33). Not Timeboxed: timeboxing is stopping or rescheduling when time <i>runs out during</i> work; splitting a too-big story <i>up front</i> is Achievable.</p>`),
+    M.ex('Exam-level', R`<p>“As a seller, I want suggestions on bundling products based on previous buyer behaviour, so that I can increase cross-selling.” The Scrum Master notes the story has no deadline or timeframe. Which letter is lacking? Then: which single edit would make the <i>original</i> 2024 T1 medicine story Specific?</p>`,
+      R`<ol><li>No deadline/timeframe → <b>Time-boxed</b> is lacking (2025 T2 Q136).</li><li>“search a medicine” → “search a medicine <b>by its generic name</b>” → Specific (2024 T1 Q29).</li></ol><p>Note: Relevant is not lacking — the cross-selling benefit gives it business value.</p>`)],
+  math: M.rule('<p><b>Qualifier → Specific. Number → Measurable. Split to fit a sprint → Achievable. Business value → Relevant. Deadline / stop when time runs out → Timeboxed.</b></p>')
+    + M.why([['Timeboxed for splitting a too-big story', 'splitting up front so it fits = Achievable.'], ['Specific for “within 4 seconds”', 'the meaning was already clear; the number makes it checkable → Measurable.'], ['Measurable for “by its generic name”', 'no number was added; ambiguity was removed → Specific.'], ['Relevant for a missing deadline', 'the story still has value; it lacks a timeframe → Timeboxed.']]),
+  conn: R`<p><b>At work:</b> “acceptance criteria” on a Jira story are the Measurable part; sprint planning enforces Achievable.</p><p><b>Earlier:</b> SMART repairs the ambiguous and incomplete requirements of concept 2.1.</p><p><b>Later:</b> Week 4 — stories that are Achievable get story points; velocity measures how many points a sprint completes.</p>`,
+  mis: M.ul(['Timeboxed vs Achievable for splitting (2023 T1 Q237, 2024 T3 Q21, 2025 T1 Q33).', 'Specific vs Measurable when a number is added (2026 T2 Q12 offers Specific first).', 'Relevant offered when a timeframe is missing (2025 T2 Q136).']),
+  exam: R`<p><b>Fast method — compare before and after, and ask what kind of edit it is:</b></p><ol><li>A number/unit appeared? → Measurable.</li><li>A qualifier narrowed the meaning? → Specific.</li><li>The story was split because it would not fit one iteration? → Achievable.</li><li>A deadline/timeframe is at stake? → Timeboxed.</li><li>Value questioned? → Relevant.</li></ol>`
+});
+Q({ cp: 'smart', type: 'mcq', diff: 'easy', q: '“Show results quickly” becomes “show results within 3 seconds”. Which SMART property improves?', opts: ['Specific', 'Measurable', 'Achievable', 'Relevant'], ans: 1,
+  why: ['The meaning was already single; a number was added.', 'Correct.', 'Size is unchanged.', 'Value is unchanged.'], sol: 'Number added → Measurable.' });
+Q({ cp: 'smart', type: 'mcq', diff: 'moderate', q: '“I want to filter orders” becomes “I want to filter orders by delivery date”. Which property improves?', opts: ['Specific', 'Measurable', 'Achievable', 'Timeboxed'], ans: 0,
+  why: ['Correct: a qualifier removes ambiguity.', 'No number or verifiable result was added.', 'Not split.', 'No timeframe.'], sol: 'Qualifier → Specific.' });
+Q({ cp: 'smart', type: 'mcq', diff: 'hard', q: 'Mid-sprint, a story is clearly overrunning its allotted time, so the team stops, splits off the remainder and reschedules it. This applies:', opts: ['Achievable', 'Timeboxed', 'Measurable', 'Specific'], ans: 1,
+  why: ['Achievable is about sizing up front.', 'Correct: stop/split/reschedule when time runs out.', 'No new measure.', 'No new qualifier.'], sol: 'Stopping when time runs out = Timeboxed (the Achievable/Timeboxed trap, reversed).' });
+Q({ cp: 'smart', type: 'short', diff: 'moderate', q: 'Explain the difference between Achievable and Timeboxed with one example each.',
+  model: '<p><b>Achievable:</b> before starting, a story too big for one iteration is split so each part fits — “search catalogue and place order” → two stories.</p><p><b>Timeboxed:</b> during work, when the time allotted to a story runs out, the team stops, splits or reschedules rather than letting it expand — e.g. halting an overrunning report feature at the end of its two days and moving the rest to the next sprint.</p>' });
+
+/* ---------------- Week 2 harder variations ---------------- */
+VQ({ kind: 'nearmiss', type: 'mcq', q: 'A ticketing app: fans buy tickets in it; a corporate travel desk buys tickets in it on behalf of executives who never open it; stadium security receives a daily gate list generated by the system but never logs in. Which classification is correct for executives and stadium security?', opts: ['Executives — secondary; security — tertiary', 'Executives — tertiary; security — secondary', 'Executives — primary; security — tertiary', 'Both — secondary'], ans: 0,
+  why: ['Correct: through an intermediary; affected without using.', 'Swapped.', 'Executives never use it themselves.', 'Security has nobody using the system on its behalf.'],
+  sol: 'Intermediary → secondary; no use at all but affected → tertiary.', trap: 'Receiving output from the system feels like “using” it.' }, ['cs3001-2023T1-235', 'cs3001-2023T2-4', 'cs3001-2024T3-19', 'cs3001-2025T2-132']);
+VQ({ kind: 'counting', type: 'num', q: 'Online exam platform. How many of these are <b>primary</b> users? (1) Students taking exams (2) Invigilators monitoring live (3) Parents who receive an emailed result (4) Question setters uploading papers (5) The university’s accreditation agency reading annual reports (6) A dean whose office staff download reports for her.', ans: 3, tol: 0,
+  sol: 'Primary: students (1), invigilators (2), question setters (4) → 3. Parents and agency are tertiary; the dean is secondary.', trap: 'Thinking only one group can be primary.' }, ['cs3001-2025T2-132', 'cs3001-2023T1-235']);
+VQ({ kind: 'scenario', type: 'mcq', q: 'Requirement A: “Every user must re-verify by OTP at each login.” Requirement B: “Trusted devices must never be asked for an OTP.” Requirement C: “Login should be secure.” Which pair correctly names the problems with A+B and with C?', opts: ['A+B inconsistent; C ambiguous', 'A+B ambiguous; C incomplete', 'A+B incomplete; C inconsistent', 'A+B inconsistent; C non-functional so no problem'], ans: 0,
+  why: ['Correct: A and B contradict; “secure” has many readings.', 'A and B are each clear; together they clash.', 'Nothing is missing from A+B; they conflict.', 'Classification does not cure vagueness.'],
+  sol: 'Contradiction between two → inconsistent; many readings in one → ambiguous.', trap: 'Option 4 mixes classification with defects.' }, ['cs3001-2025T2-133']);
+VQ({ kind: 'nearmiss', type: 'mcq', q: 'A requirements engineer emails the same 30 multiple-choice questions to 4,000 delivery riders across India, with no follow-up. Which technique — and which weakness applies most?', opts: ['Structured interview — slow', 'Questionnaire — misses hidden requirements because there is no follow-up', 'Focus group — dominated by loud voices', 'Documentation — rules may be outdated'], ans: 1,
+  why: ['Nothing is asked aloud.', 'Correct.', 'There is no group discussion.', 'No documents are read.'],
+  sol: 'Sent + many + specific → questionnaire; its weakness is no follow-up.', trap: '“Same questions to everyone” also describes a structured interview — the medium (emailed) decides.' }, ['cs3001-2023T2-5', 'cs3001-2024T3-20', 'cs3001-2026T1-6', 'cs3001-2024T2-4', 'cs3001-2026T2-2']);
+VQ({ kind: 'counting', type: 'num', q: 'For a GST-filing app the team: (1) reads the GST Act and rules, (2) sits with an accountant for an hour asking whatever comes up, (3) watches clerks file returns at a CA firm, (4) reads competitor apps’ help FAQs, (5) emails a 20-question survey to 2,000 shopkeepers, (6) reads the client company’s internal filing procedure manual. How many activities are <b>documentation</b>?', ans: 3, tol: 0,
+  sol: '(1), (4), (6) → 3. (2) unstructured interview, (3) naturalistic observation, (5) questionnaire.', trap: 'Competitor FAQs are documents too (2025 T2 Q135).' }, ['cs3001-2023T1-236', 'cs3001-2025T1-39', 'cs3001-2025T2-135', 'cs3001-2023T3-179']);
+VQ({ kind: 'negated', type: 'mcq', q: 'Which pairing of technique and main objective is <b>INCORRECT</b>?', opts: ['Interviews — to explore issues', 'Focus groups — to collect multiple viewpoints', 'Naturalistic observation — to understand procedures, regulations and standards', 'Documentation — to understand procedures, regulations and standards'], ans: 2,
+  why: ['Correct pairing.', 'Correct pairing.', 'Incorrect — observation is for understanding the context.', 'Correct pairing.'],
+  sol: 'The 2024 T1 Q25 match, inverted.', trap: 'Options 3 and 4 share the same objective text; only one technique owns it.' }, ['cs3001-2024T1-25', 'cs3001-2025T3-6', 'cs3001-2025T1-23']);
+VQ({ kind: 'counting', type: 'num', q: 'Hotel-booking app. How many are <b>non-functional</b>? (1) Users can cancel a booking up to 24 hours before check-in. (2) Search results appear within 2 seconds for 95% of queries. (3) The app supports 20,000 concurrent users during sales. (4) The app emails a confirmation after payment. (5) If the payment gateway times out, the app shows a retry option and does not crash. (6) The app runs on Android 9 and above.', ans: 4, tol: 0,
+  sol: 'Non-functional: (2) performance, (3) load, (5) robustness, (6) portability → 4. (1) and (4) are capabilities.', trap: '(1) contains a number (24 hours) but it is a business rule describing what the system allows — a functional capability. Numbers are a strong hint, not an absolute rule.' }, ['cs3001-2024T1-24', 'cs3001-2025T1-37', 'cs3001-2026T1-25']);
+VQ({ kind: 'negated', type: 'mcq', q: 'R1: “The portal must lock an account after 5 failed logins.” R2: “The portal must respond to a login attempt within 1 second.” Which statement is <b>NOT</b> true?', opts: ['R2 is non-functional', 'R1 describes a behaviour the system performs', 'Both are non-functional because both contain numbers', 'R2 would be verified by measurement'], ans: 2,
+  why: ['True.', 'True: locking is an action.', 'Not true — R1’s number is part of a rule about what the system does; it remains functional.', 'True.'],
+  sol: 'A number inside a business rule does not by itself make a requirement non-functional; ask “what” vs “how well”.', trap: 'Blindly applying “number → non-functional”.' }, ['cs3001-2024T2-5', 'cs3001-2024T3-4', 'cs3001-2025T3-7', 'cs3001-2026T2-11']);
+VQ({ kind: 'nearmiss', type: 'mcq', q: 'Which instruction about SRS clarity is the best one?', opts: ['Use precise technical terms throughout so developers cannot misread it', 'Write it so that both technical and non-technical stakeholders understand every requirement unambiguously', 'Keep requirements high-level so developers have freedom', 'Leave wording flexible so that later changes need no re-signing'], ans: 1,
+  why: ['Precise but excludes non-technical readers — near miss.', 'Correct.', 'Incomplete.', 'Ambiguous.'],
+  sol: 'Clarity for everyone is the goal.', trap: 'Option 1 sounds professional.' }, ['cs3001-2023T3-180']);
+VQ({ kind: 'negated', type: 'mcq', q: 'Which is <b>NOT</b> a valid description of a user story?', opts: ['Expresses a requirement from the end-user’s perspective', 'Follows As a [role], I want [feature], so that [benefit]', 'Is a detailed description of how the code is structured', 'Is small enough to be completed in one sprint'], ans: 2,
+  why: ['Valid.', 'Valid.', 'Not valid — stories describe behaviour, not implementation.', 'Valid.'],
+  sol: 'Stories are about behaviour and value.', trap: 'Three valid descriptions listed first.' }, ['cs3001-2023T3-178', 'cs3001-2026T1-7']);
+VQ({ kind: 'chained', type: 'mcq', block: { id: 'V2', text: '<p>Original story: “As a commuter, I want to book a cab and pay, so that I reach office.” Refinement 1: split into “book a cab” and “pay for a ride”. Refinement 2: “book a cab” becomes “book a cab <i>by entering a pickup pin-code</i>”. Refinement 3: “…the nearest driver is shown <i>within 5 seconds</i>”.</p>' },
+  q: 'Which SMART letters do Refinements 1, 2 and 3 improve, in order?', opts: ['Achievable, Specific, Measurable', 'Timeboxed, Specific, Measurable', 'Achievable, Measurable, Specific', 'Specific, Achievable, Measurable'], ans: 0,
+  why: ['Correct.', 'Splitting up front is Achievable, not Timeboxed.', '2 adds a qualifier, 3 adds a number — swapped.', '1 is a split, not a qualifier.'],
+  sol: 'Split → A; qualifier → S; number → M. One wrong link kills the option.', trap: 'Option 2 differs only in the first letter.' }, ['cs3001-2023T1-237', 'cs3001-2024T3-21', 'cs3001-2025T1-33', 'cs3001-2024T1-29']);
+VQ({ kind: 'negated', type: 'mcq', q: '“…so that I can see the fare within a reasonable time” becomes “…within 4 seconds”. Which statement is <b>INCORRECT</b>?', opts: ['The story is now more Measurable', 'A tester can now pass or fail it', 'The story is now more Specific because it is shorter', 'The change adds a verifiable expected result'], ans: 2,
+  why: ['Correct statement.', 'Correct statement.', 'Incorrect — adding a number improves Measurable; length has nothing to do with Specific.', 'Correct statement.'],
+  sol: 'Number → Measurable.', trap: 'Specific is the most-offered decoy for this family.' }, ['cs3001-2023T2-15', 'cs3001-2024T2-15', 'cs3001-2025T3-8', 'cs3001-2026T2-12']);
+VQ({ kind: 'scenario', type: 'mcq', q: '“As a teacher, I want to auto-grade MCQ tests, so that I save time.” The product owner says: “Great idea, but it must be delivered within the next two-week sprint or dropped.” Which SMART letter is being enforced?', opts: ['Relevant', 'Timeboxed', 'Achievable', 'Specific'], ans: 1,
+  why: ['Value is not questioned.', 'Correct: a fixed timeframe.', 'Nothing is split.', 'No ambiguity is removed.'],
+  sol: 'Deadline/timeframe → Timeboxed (2025 T2 Q136 twin).', trap: 'Relevant tempts because the PO comments on value.' }, ['cs3001-2025T2-136']);
+
+[['Primary user', 'Frequent, direct user of the system.'], ['Secondary user', 'Uses the system through an intermediary, not directly.'], ['Tertiary user', 'Does not use the system at all but is affected by it or influences its purchase.'],
+ ['Requirement gathering', 'Actively collecting what the system must do from clients and stakeholders.'], ['Requirement analysis', 'Checking gathered requirements for completeness, consistency and absence of ambiguity.'],
+ ['Ambiguous requirement', 'Can be read in more than one way.'], ['Inconsistent requirements', 'Two requirements that contradict each other.'], ['Incomplete requirement', 'Something important was never stated.'],
+ ['Questionnaire', 'Specific questions sent to a large group; no follow-up.'], ['Structured interview', 'Fixed questions, same order, asked to everyone.'], ['Semi-structured interview', 'Fixed base questions plus free follow-ups.'], ['Unstructured interview', 'Open-ended conversation; follow-ups adapt to answers.'],
+ ['Focus group', 'Group discussion collecting multiple viewpoints, consensus and conflict.'], ['Naturalistic observation', 'Watching users perform tasks in their real setting.'], ['Documentation (technique)', 'Reading procedures, rules, regulations and standards.'],
+ ['Functional requirement', 'What the system does — a capability, input → output.'], ['Non-functional requirement', 'How well the system behaves — performance, reliability, robustness, portability, security.'],
+ ['Reliability', 'Behaves the same way over time in the same environment.'], ['Robustness', 'Recovers from errors or unexpected input without crashing.'], ['SRS', 'Software Requirements Specification: formal document of all requirements.'],
+ ['BDD', 'Behaviour-driven design: ask about behaviour continuously; write requirements as user stories.'], ['User story', 'As a [role], I want [feature], so that [benefit] — smallest unit of work for a sprint.'], ['SMART', 'Specific, Measurable, Achievable, Relevant, Timeboxed.']].forEach(([t, d]) => GLOSS(t, d, 2));
+[['Courier phoned by the shop, never uses the app — user type?', 'Tertiary.'], ['Executive whose assistant uses the app?', 'Secondary.'], ['Two stakeholders contradict each other — problem?', 'Inconsistent.'],
+ ['Fixed list asked aloud to everyone?', 'Structured interview.'], ['Open-ended, adapting follow-ups?', 'Unstructured interview.'], ['Specific questions to thousands?', 'Questionnaire.'], ['Visit shops and watch customers?', 'Naturalistic observation.'], ['Read regulations / policies / FAQs?', 'Documentation.'], ['Why focus groups?', 'Multiple viewpoints; consensus and conflicts.'],
+ ['“Within 3 seconds” — F or NF?', 'Non-functional.'], ['Reliability vs robustness?', 'Same over time vs recovers from bad input.'], ['User-story template?', 'Role – Feature – Benefit.'],
+ ['“Reasonable time” → “4 seconds” improves…', 'Measurable.'], ['Split a story too big for one sprint…', 'Achievable.'], ['Add “by generic name”…', 'Specific.'], ['Story lacks a deadline…', 'Timeboxed.']].forEach(([f, b]) => CARD(f, b, 2));
+
 /* ---- courses/cs3001/pyq.js ---- */
 /* ============================================================
    Software Engineering — Quiz 2 past papers (PYQs), mapped by concept.
@@ -1531,6 +1877,371 @@ PQ(SE, '2026T2', 21, 4, 'msq', { fam: "f-models",
   why: ["True: clarifies user expectations.", "True: identifies design issues early.", "False: zero defects is never guaranteed.", "True: early requirement refinement."],
   sol: "<p>Three true, one permanent decoy. Answer 1, 2, 4.</p>",
   trap: "Three answers — do not stop at two." });
+
+/* ---------------- Week 2 ---------------- */
+PQ(SE, '2023T1', 235, 4, 'mcq', { fam: "f-users",
+  cs: ["users"],
+  week: 2,
+  diff: "easy",
+  q: "<p>Consider an online flower store where users can place an order to send flower bouquets. The customers can select from a range of bouquets and place an order. Once the order is placed the store manager makes a phone call to the courier service provider to pick up the ordered item from the physical store and arrange the delivery.</p><p>Identify the most appropriate user type for the courier service provider</p>",
+  opts: ["Primary users", "Secondary users", "Tertiary users", "Not a valid user"],
+  ans: 2,
+  why: ["False: primary users operate the app directly and often; the courier never opens it.", "False: secondary users use the system through an intermediary; nobody operates the app on the courier’s behalf — the manager simply phones them.", "True: the courier never uses the app but every order changes their work — affected without using.", "False: people affected by a system are still stakeholders/users in the course’s three-way classification."],
+  sol: "<ol><li>Does the courier use the app directly? No → not primary.</li><li>Does someone operate it for the courier? No → not secondary.</li><li>Is the courier affected? Yes, each order triggers a pickup → <b>tertiary</b>.</li></ol>",
+  trap: "“Secondary” tempts because the manager stands between the app and the courier — but the manager is not using the app <i>for</i> the courier." });
+PQ(SE, '2023T1', 236, 4, 'mcq', { fam: "f-gather",
+  cs: ["gathering"],
+  week: 2,
+  diff: "easy",
+  q: "<p>An organisation has planned to develop an online pet store app that would allow its customers to buy and sell different pet animals on this common platform. The organisation goes through several documents regarding pet shop rules and the duties and obligations of the pet shop owners as part of their requirements gathering.</p><p>What kind of requirement-gathering technique is used in the given scenario?</p>",
+  opts: ["Interviews", "Focus groups", "Naturalistic observations", "Documentation"],
+  ans: 3,
+  why: ["False: no one is being questioned.", "False: no group discussion takes place.", "False: nobody is watched at work.", "True: reading rules and obligations is documentation."],
+  sol: "<p>Verb: “goes through several documents regarding … rules” → <b>documentation</b>.</p>",
+  trap: "Rules about pet-shop owners sound like you need to talk to owners (interviews)." });
+PQ(SE, '2023T1', 237, 4, 'mcq', { fam: "f-smart",
+  cs: ["smart"],
+  week: 2,
+  diff: "moderate",
+  q: "<p>Consider that for a software project, the requirements are collected as user stories. After the creation of the user stories, it was found that the implementation of some of the user stories was not possible with a single agile iteration. Therefore, those user stories are subdivided into smaller user stories. This process makes the user stories _________.</p><p>Fill in the blank with the appropriate option.</p>",
+  opts: ["Measurable", "Achievable", "Relevant", "Timeboxed"],
+  ans: 1,
+  why: ["False: no measure was added.", "True: splitting so each story fits one iteration = Achievable.", "False: business value is unchanged.", "False: timeboxing is stopping/rescheduling when allotted time runs out, not up-front splitting."],
+  sol: "<p>Too big for one iteration → split → <b>Achievable</b>.</p>",
+  trap: "“Iteration” suggests time → Timeboxed." });
+PQ(SE, '2023T2', 4, 2, 'mcq', { fam: "f-users",
+  cs: ["users"],
+  week: 2,
+  diff: "moderate",
+  q: "<p>Consider a small organization that wants to develop a mobile application to sell handcrafted jewelry. Customers can search their catalog and place orders. The mobile application also allows customers to place orders where they can specify the design. After receiving the design, the organization contacts (offline, like through a phone call) a preapproved jeweler to place a purchase order for the given design. The organization also has an auditor who accesses the mobile application a couple of times a year to audit the sales and purchase records. Identify the tertiary users for the mobile application.</p>",
+  opts: ["The customers who makes purchase using the mobile application", "The organization who sales the handcrafted jewelry using the mobile application", "The preapproved jewellers who makes the jewelry as per the design given by the customers", "The auditors"],
+  ans: 2,
+  why: ["False: customers search and order in the app directly — primary.", "False: the organization operates the app (it sells through it) — a direct user.", "True: jewellers are contacted offline and never use the app, but its orders drive their work — tertiary.", "False: auditors access the app themselves; infrequent direct use is still direct use."],
+  sol: "<ol><li>List who touches the app: customers, the organization, auditors (twice a year, but directly).</li><li>Who never touches it but is affected? The jewellers, reached by phone.</li><li>Answer: the preapproved jewellers.</li></ol>",
+  trap: "Auditors use it rarely, which feels “tertiary” — frequency does not decide it; direct access does." });
+PQ(SE, '2023T2', 5, 2, 'mcq', { fam: "f-gather",
+  cs: ["gathering"],
+  week: 2,
+  diff: "easy",
+  q: "<p>Which of the following requirement gathering technique is best suite for getting answers to specific questions from a large group of people?</p>",
+  opts: ["Questionnaires", "Interviews", "Focus groups", "Naturalistic observations"],
+  ans: 0,
+  why: ["True: specific questions to a large group is exactly what questionnaires are for.", "False: interviews are for depth with few people; slow for a large group.", "False: focus groups gather viewpoints from a small group.", "False: observation does not answer specific questions."],
+  sol: "<p>Specific questions + large group → <b>questionnaires</b>.</p>",
+  trap: "Interviews also ask questions — but they do not scale." });
+PQ(SE, '2023T2', 15, 4, 'mcq', { fam: "f-smart",
+  cs: ["smart"],
+  week: 2,
+  diff: "easy",
+  q: "<p>Consider the following user story regarding a library management system.</p><pre class=\"code\">Feature: Track users' details\nAs a librarian,\nI want to scan the library cards of the users\nSo that I can retrieve the users' details within a reasonable time.</pre><p>Consider the following improvement in the user story as follows.</p><pre class=\"code\">Feature: Track users' details\nAs a librarian,\nI want to scan the library cards of the users\nSo that I can retrieve the users' details within a second.</pre><p>It makes the user story more ________.</p>",
+  opts: ["Specific", "Measurable", "Achievable", "Relevant", "Timeboxed"],
+  ans: 1,
+  why: ["False: the meaning was already single; only a number was added.", "True: “reasonable time” → “a second” is now verifiable.", "False: size unchanged.", "False: value unchanged.", "False: no deadline for delivering the story was added; the second is a response time."],
+  sol: "<p>A vague phrase became a number → <b>Measurable</b>.</p>",
+  trap: "“Within a second” is a time, so Timeboxed tempts — but timeboxing is about the work, not the response." });
+PQ(SE, '2023T3', 178, 2, 'mcq', { fam: "f-story",
+  cs: ["user-stories"],
+  week: 2,
+  diff: "easy",
+  q: "<p>In Behavior Driven Design (BDD), what are \"user stories\"?</p>",
+  opts: ["A form of documentation used for project management", "A list of tasks assigned to developers", "A detailed description of how the code is structured", "A way to express software requirements from an end-user perspective"],
+  ans: 3,
+  why: ["False: stories describe user needs, not project-management records.", "False: tasks are derived from stories.", "False: stories describe behaviour, not code structure.", "True: requirements from the end-user’s perspective."],
+  sol: "<p>As a [role], I want [feature], so that [benefit] — the user’s perspective.</p>",
+  trap: "Option 2: stories do end up on task boards, but they are not tasks." });
+PQ(SE, '2023T3', 179, 2, 'mcq', { fam: "f-gather",
+  cs: ["gathering"],
+  week: 2,
+  diff: "easy",
+  q: "<p>An organisation wants to develop a mobile app to receive orders for grocery items online and deliver them within an hour. Therefore, a team from the organisation has visited some famous grocery shops across the country to observe how customers place orders, how payments are made, and in what mode the items are delivered to the customers.</p><p>Identify the type of requirement collection technique used in the given scenario.</p>",
+  opts: ["Questionnaires", "Focus group", "Documentations", "Naturalistic observations"],
+  ans: 3,
+  why: ["False: nothing is sent out.", "False: no group is convened.", "False: no documents are read.", "True: the team visits shops and watches customers in the real setting."],
+  sol: "<p>“Visited … to observe how customers place orders” → <b>naturalistic observation</b>.</p>",
+  trap: "None strong; “focus group” is a distractor for anything involving several people." });
+PQ(SE, '2023T3', 180, 2, 'mcq', { fam: "f-srs",
+  cs: ["srs"],
+  week: 2,
+  diff: "easy",
+  q: "<p>When creating a Software Requirement Specification (SRS), what should be the primary focus regarding the clarity of requirements?</p>",
+  opts: ["Write requirements in a technical language to ensure precision.", "Use ambiguous language to allow for flexibility during development.", "Ensure that requirements are clear, unambiguous, and understandable by both technical and non-technical stakeholders.", "Only specify high-level requirements to provide flexibility to developers."],
+  ans: 2,
+  why: ["False: technical language excludes non-technical stakeholders.", "False: ambiguity is a requirement defect.", "True: clear, unambiguous, understandable by everyone.", "False: high-level only leaves the SRS incomplete."],
+  sol: "<p>The SRS is an agreement between both sides, so both must understand it unambiguously.</p>",
+  trap: "Option 1 sounds professional." });
+PQ(SE, '2024T1', 24, 5, 'mcq', { fam: "f-frnfr",
+  cs: ["fr-nfr"],
+  week: 2,
+  diff: "moderate",
+  q: "<p>Consider the following requirements for a mobile app that enables its customers to choose and order various grocery items: Requirement 1: The mobile app must be able to support a minimum of 100 simultaneous client requests. Requirement 2: The mobile app must enable the customer to search for various grocery items. Requirement 3: The mobile app must be able to display different brand options available for each grocery item. Requirement 4: Once a customer places an order, the mobile app must be able to generate the invoice and delivery information within a second.</p><p>Which of the following statements is true?</p>",
+  opts: ["Requirements 1, 2, and 3 are functional requirements, whereas requirement 1 is a non-functional requirement.", "Requirements 2 and 3 are functional requirements, whereas requirements 1 and 4 are non-functional requirements.", "Requirements 1 and 4 are functional requirements, whereas requirements 2 and 3 are non-functional requirements.", "Requirement 2 is a functional requirement, whereas requirements 1, 3, and 4 are non-functional requirements."],
+  ans: 1,
+  why: ["False: requirement 1 is a load figure (non-functional), and the option contradicts itself.", "True: 2 and 3 are capabilities; 1 (100 simultaneous requests) and 4 (within a second) are quality constraints.", "False: reversed.", "False: 3 (display brand options) is a capability."],
+  sol: "<ol><li>R1: a load figure → NF.</li><li>R2: search → F.</li><li>R3: display brands → F.</li><li>R4: “within a second” → NF (generating the invoice is a capability, but the requirement is about the time).</li><li>Split: F = {2, 3}, NF = {1, 4}.</li></ol>",
+  trap: "R4 starts with a capability (“generate the invoice”); the time limit is what makes it non-functional." });
+PQ(SE, '2024T1', 25, 5, 'mcq', { fam: "f-gather",
+  cs: ["gathering"],
+  week: 2,
+  diff: "moderate",
+  q: "<p>Match the following on the context of requirement gathering techniques.</p><table class=\"t\"><tr><th>Techniques</th><th>Main objective</th></tr><tr><td>A. Interviews</td><td>1. To collect multiple viewpoints</td></tr><tr><td>B. Focus groups</td><td>2. To understand procedures, regulations, and standards</td></tr><tr><td>C. Naturalistic Observations</td><td>3. To explore issues</td></tr><tr><td>D. Documentation</td><td>4. To understand the context</td></tr></table>",
+  opts: ["A-3, B-4, C-1, D-2", "A-3, B-1, C-4, D-2", "A-2, B-4, C-1, D-3", "A-2, B-1, C-4, D-3"],
+  ans: 1,
+  why: ["False: B–4 and C–1 swap focus groups with observation.", "True: A–3 explore, B–1 viewpoints, C–4 context, D–2 procedures.", "False: A–2 gives interviews the documentation objective.", "False: A–2 and D–3 swap interviews and documentation."],
+  sol: "<ol><li>D is the easiest: documents → procedures, regulations (2). That leaves options 1 and 2.</li><li>B: groups → multiple viewpoints (1). Only option 2 has B–1 with D–2.</li><li>Check: A–3 explore, C–4 context. ✓</li></ol>",
+  trap: "Option 1 differs only in B and C — knowing D alone does not finish it." });
+PQ(SE, '2024T1', 29, 5, 'mcq', { fam: "f-smart",
+  cs: ["smart"],
+  week: 2,
+  diff: "moderate",
+  q: "<p>Consider developing an online medicine application that enables its customers to search for and purchase medicine online. One of the user stories for the application is given below.</p><pre class=\"code\">Feature: Search for medicines\nAs a customer,\nI want to search a medicine.\nSo that I get a list of brand names for the medicine.</pre><p>The user story is rectified as follows:</p><pre class=\"code\">Feature: Search for medicines\nAs a customer,\nI want to search a medicine by its generic name.\nSo that I get a list of brand names for the medicine.</pre><p>Which of the SMART characteristics is achieved by rectification?</p>",
+  opts: ["Specific", "Measurable", "Achievable", "Timeboxed"],
+  ans: 0,
+  why: ["True: “by its generic name” removes ambiguity about what is searched.", "False: no measure or number was added.", "False: not split.", "False: no timeframe."],
+  sol: "<p>A qualifier narrowed the meaning → <b>Specific</b>.</p>",
+  trap: "Any improvement is reflexively called “Measurable”." });
+PQ(SE, '2024T2', 4, 4, 'mcq', { fam: "f-gather",
+  cs: ["gathering"],
+  week: 2,
+  diff: "easy",
+  q: "<p>A software organization gathers requirements to develop an e-shopping application and is therefore planning to interview independent sellers to understand what sort of products they are selling. A fixed set of questions is prepared for the interview, which will be asked of the sellers.</p><p>Identify the type of interview.</p>",
+  opts: ["Structured interview", "Semistructured interview", "Unstructured interview", "Questionnaires"],
+  ans: 0,
+  why: ["True: a fixed set of questions asked to every seller in an interview.", "False: semi-structured adds free follow-ups; none mentioned.", "False: unstructured has no fixed set.", "False: it is explicitly an interview, not a form sent out."],
+  sol: "<p>Interview + fixed questions → <b>structured</b>.</p>",
+  trap: "“Fixed set of questions” also describes a questionnaire, which is offered as a decoy." });
+PQ(SE, '2024T2', 5, 4, 'mcq', { fam: "f-frnfr",
+  cs: ["fr-nfr"],
+  week: 2,
+  diff: "moderate",
+  q: "<p>Consider building a portal for an educational institute which has the following two requirements:</p><p>Requirement 1: Students must be authenticated by verifying their login credentials, as well as the OTP issued to their registered mobile number, to log into the system. Requirement 2: The OTPs should be sent with a latency of no more than 2 minutes after such an activity.</p><p>Which of the following statement is true.</p>",
+  opts: ["Requirement 1 is a functional requirement, whereas Requirement 2 is a non functional requirement.", "Requirement 2 is a functional requirement, whereas Requirement 1 is a non functional requirement.", "Both the requirements are functional requirements.", "Both the requirements are non functional requirements."],
+  ans: 0,
+  why: ["True: authentication with credentials + OTP is a capability; OTP latency ≤ 2 minutes is a performance constraint.", "False: reversed.", "False: R2 carries a time limit.", "False: R1 describes what the system does."],
+  sol: "<p>R1 = what (authenticate) → F. R2 = how fast → NF.</p>",
+  trap: "R1 is security-flavoured, so it looks like a security NFR — but it describes a behaviour." });
+PQ(SE, '2024T2', 15, 5, 'mcq', { fam: "f-smart",
+  cs: ["smart"],
+  week: 2,
+  diff: "easy",
+  q: "<p>Consider the user story below for an online cooking app that enables users to search for and download recipes for several types of dishes.</p><pre class=\"code\">Feature 1: Search recipes\nAs a customer,\nI want to search for a recipe\nso that I can get the recipe for the dish along with its ingredients.</pre><p>The user story is improved as:</p><pre class=\"code\">Feature 1: Search recipes\nAs a customer,\nI want to search for a recipe\nso that I can get the recipe for the dish along with its ingredients. The search\nresult must be displayed within a second.</pre><p>It makes the user story more ________.</p>",
+  opts: ["Specific", "Measurable", "Achievable", "Relevant", "Timeboxed"],
+  ans: 1,
+  why: ["False: nothing was disambiguated.", "True: a verifiable time was added.", "False: not split.", "False: value unchanged.", "False: response time, not a timeframe for the work."],
+  sol: "<p>Number added → <b>Measurable</b>.</p>",
+  trap: "Timeboxed for “within a second”." });
+PQ(SE, '2024T3', 4, 4, 'mcq', { fam: "f-frnfr",
+  cs: ["fr-nfr"],
+  week: 2,
+  diff: "easy",
+  q: "<p>Consider the following two requirements for a school portal:</p><p>Requirement 1: The portal should allow bulk upload of the students' marks.</p><p>Requirement 2: The portal should allow a student to download his or her marksheet within 30 seconds. Which of the following statements is true?</p>",
+  opts: ["Requirement 1 is a functional requirement, whereas Requirement 2 is a non functional requirement.", "Requirement 2 is a functional requirement, whereas Requirement 1 is a non functional requirement.", "Both requirements are functional requirements.", "Both requirements are non functional requirements."],
+  ans: 0,
+  why: ["True: bulk upload is a capability; “within 30 seconds” is a time constraint.", "False: reversed.", "False: R2 is about time.", "False: R1 is a capability."],
+  sol: "<p>R1 F, R2 NF.</p>",
+  trap: "R2 mentions downloading a marksheet, which is a feature, but the requirement is the 30-second limit." });
+PQ(SE, '2024T3', 19, 4, 'mcq', { fam: "f-users",
+  cs: ["users"],
+  week: 2,
+  diff: "easy",
+  q: "<p>Identify the most appropriate user type for the courier service provider.</p>",
+  opts: ["Primary users", "Secondary users", "Tertiary users", "Not a valid user"],
+  ans: 2,
+  why: ["False: the courier does not operate the gift-shop system.", "False: no one uses the system on the courier’s behalf.", "True: never uses it, but affected by every order.", "False: an affected party is a (tertiary) user in the course’s model."],
+  sol: "<p>Same structure as 2023 T1 Q235: contacted outside the system, affected by it → <b>tertiary</b>.</p>",
+  trap: "The store manager “contacting” the courier is read as using the system on their behalf.",
+  block: {"id": "2024T3-gift", "text": "<p>Consider a software organization developing an online gift shop where customers can place an order to send gifts to their friends and family members staying in the same city. The customers can select from a range of gifts and place an order. After placing the order, the store manager contacts the courier service provider via phone call to collect the item from the physical store and schedule delivery.</p>"} });
+PQ(SE, '2024T3', 20, 4, 'mcq', { fam: "f-gather",
+  cs: ["gathering"],
+  week: 2,
+  diff: "easy",
+  q: "<p>The developers of the online gift store want to explore the types of gift items to be kept in the catalog. Therefore, they want to gather responses for some specific questions from a large group of people. Which requirement gathering technique would be the most effective for this purpose?</p>",
+  opts: ["Questionnaires", "Interviews", "Focus groups and workshops", "Documentation"],
+  ans: 0,
+  why: ["True: specific questions, large group.", "False: too slow for a large group.", "False: groups explore viewpoints, not specific answers at scale.", "False: no documents."],
+  sol: "<p>Specific questions + large group → <b>questionnaires</b>.</p>",
+  trap: "Interviews feel more thorough — thoroughness is not what is asked.",
+  block: {"id": "2024T3-gift", "text": "<p>Consider a software organization developing an online gift shop where customers can place an order to send gifts to their friends and family members staying in the same city. The customers can select from a range of gifts and place an order. After placing the order, the store manager contacts the courier service provider via phone call to collect the item from the physical store and schedule delivery.</p>"} });
+PQ(SE, '2024T3', 21, 4, 'mcq', { fam: "f-smart",
+  cs: ["smart"],
+  week: 2,
+  diff: "moderate",
+  q: "<p>Consider a user story for the online gift shop that describes the following feature:</p><p>Feature 1: Search catalog and place order</p><p>However, it has been found that implementation of Feature 1 is not possible within one agile iteration. Therefore the Feature 1 is subdivided as follows:</p><p>Feature 1a: Search catalog and Feature 1b: Place order</p><p>Which of the SMART characteristics is fulfilled by the refinement?</p>",
+  opts: ["Specific", "Measurable", "Achievable", "Relevant", "Time-bound"],
+  ans: 2,
+  why: ["False: no ambiguity removed.", "False: no measure added.", "True: split so each part fits one iteration.", "False: value unchanged.", "False: splitting up front is not time-boxing."],
+  sol: "<p>Not possible in one iteration → subdivided → <b>Achievable</b>.</p>",
+  trap: "Time-bound tempts because “iteration” is a time unit.",
+  block: {"id": "2024T3-gift", "text": "<p>Consider a software organization developing an online gift shop where customers can place an order to send gifts to their friends and family members staying in the same city. The customers can select from a range of gifts and place an order. After placing the order, the store manager contacts the courier service provider via phone call to collect the item from the physical store and schedule delivery.</p>"} });
+PQ(SE, '2025T1', 23, 4, 'mcq', { fam: "f-gather",
+  cs: ["gathering"],
+  week: 2,
+  diff: "easy",
+  q: "<p>A hiring manager is conducting an interview with a candidate. Instead of following a predefined set of questions, the manager asks open-ended questions and adapts the follow-up questions based on the candidate's responses, allowing for a free-flowing conversation.</p><p>Which type of interview is the manager conducting?</p>",
+  opts: ["Structured interview", "Semistructured interview", "Unstructured interview", "Questionnaires"],
+  ans: 2,
+  why: ["False: no predefined set.", "False: semi-structured still has a predefined base.", "True: open-ended, adaptive, free-flowing.", "False: it is a conversation, not a form."],
+  sol: "<p>No predefined questions + adaptive follow-ups → <b>unstructured interview</b>.</p>",
+  trap: "Semi-structured is tempting because follow-ups adapt — but it needs a fixed base." });
+PQ(SE, '2025T1', 33, 4, 'mcq', { fam: "f-smart",
+  cs: ["smart"],
+  week: 2,
+  diff: "moderate",
+  q: "<p>In an agile project, the team is working on implementing a user story. If the user story cannot be completed within one iteration (1-2 weeks), the team decides to subdivide it into smaller, more manageable ones.</p><p>What does this approach make the user story?</p>",
+  opts: ["Specific", "Measurable", "Achievable", "Relevant", "Timeboxed"],
+  ans: 2,
+  why: ["False.", "False.", "True: subdividing so it fits one iteration.", "False.", "False: the decision is about size up front."],
+  sol: "<p>Subdivide to fit 1–2 weeks → <b>Achievable</b>.</p>",
+  trap: "The stem mentions “(1-2 weeks)”, pushing towards Timeboxed." });
+PQ(SE, '2025T1', 37, 5, 'mcq', { fam: "f-frnfr",
+  cs: ["fr-nfr"],
+  week: 2,
+  diff: "moderate",
+  q: "<p>Consider the following requirements for a mobile app that allows users to book and manage appointments at a healthcare clinic:</p><p>Requirement 1: The mobile app must be able to support at least 500 simultaneous user logins. Requirement 2: The mobile app must allow users to view the available doctors and their appointment slots. Requirement 3: The mobile app must notify users when an appointment is successfully booked. Requirement 4: The mobile app must be able to process payments for appointments within 3 seconds.</p><p>Which of the following statements is true?</p>",
+  opts: ["Requirements 1, 2, and 3 are functional requirements, whereas requirement 4 is a non-functional requirement.", "Requirements 2 and 3 are functional requirements, whereas requirements 1 and 4 are non-functional requirements.", "Requirements 1 and 4 are functional requirements, whereas requirements 2 and 3 are non-functional requirements.", "Requirement 2 is a functional requirement, whereas requirements 1, 3, and 4 are non-functional requirements."],
+  ans: 1,
+  why: ["False: R1 (500 simultaneous logins) is a load figure → NF.", "True: R2 view slots and R3 notify are capabilities; R1 load and R4 within 3 seconds are constraints.", "False: reversed.", "False: R3 (notify) is a capability."],
+  sol: "<p>F = {2, 3}; NF = {1, 4}. Same structure as 2024 T1 Q24.</p>",
+  trap: "“Process payments” sounds like a feature; the 3-second limit makes R4 NF." });
+PQ(SE, '2025T1', 39, 3, 'mcq', { fam: "f-gather",
+  cs: ["gathering"],
+  week: 2,
+  diff: "easy",
+  q: "<p>Which requirement collection technique involves gathering detailed information from recorded procedures, rules, steps, and regulations pertaining to a specific task or activity?</p>",
+  opts: ["Questionnaires", "Interviews", "Focus group", "Documentations"],
+  ans: 3,
+  why: ["False: questionnaires ask people.", "False: interviews ask people.", "False: groups discuss.", "True: recorded procedures, rules and regulations = documentation."],
+  sol: "<p>Recorded procedures and regulations → <b>documentation</b>.</p>",
+  trap: "None strong." });
+PQ(SE, '2025T2', 132, 4, 'mcq', { fam: "f-users",
+  cs: ["users"],
+  week: 2,
+  diff: "moderate",
+  q: "<p>You are developing an online education platform. Professors use the system to upload materials, students access the content, and the university’s accreditation body occasionally reviews course reports generated from the system.</p><p>Which of the following correctly categorizes the stakeholders?</p>",
+  opts: ["Professors – Primary users; Students – Secondary users; Accreditation body – Tertiary users", "Professors – Secondary users; Students – Primary users; Accreditation body – Tertiary users", "Professors – Primary users; Students – Primary users; Accreditation body – Tertiary users", "Professors – Tertiary users; Students – Secondary users; Accreditation body – Primary users"],
+  ans: 2,
+  why: ["False: students access content directly — they are primary, not secondary.", "False: professors upload materials directly — primary.", "True: both professors and students use it directly; the accreditation body only reviews generated reports — tertiary.", "False: reversed; the accreditation body never operates the system."],
+  sol: "<ol><li>Professors: direct, frequent → primary.</li><li>Students: direct, frequent → primary (two primary groups are allowed).</li><li>Accreditation body: affected/influential, does not operate → tertiary.</li></ol>",
+  trap: "Assuming only one group can be primary, so students get pushed down to “secondary”." });
+PQ(SE, '2025T2', 133, 4, 'mcq', { fam: "f-reqprob",
+  cs: ["users"],
+  week: 2,
+  diff: "easy",
+  q: "<p>One stakeholder wants user passwords to expire every 30 days. Another insists users must not be forced to change passwords more than once a year.</p><p>What kind of requirement issue is this?</p>",
+  opts: ["Incomplete", "Ambiguous", "Inconsistent", "Implicit"],
+  ans: 2,
+  why: ["False: nothing is missing; both needs are stated.", "False: each statement on its own has a single clear meaning.", "True: the two requirements cannot both be satisfied — they contradict.", "False: “implicit” is not one of the course’s requirement problems, and both are explicit."],
+  sol: "<p>Two clear requirements that clash → <b>inconsistent</b>.</p>",
+  trap: "“Ambiguous” is the reflex answer for any messy requirement; ambiguity is about one statement with many readings." });
+PQ(SE, '2025T2', 135, 4, 'mcq', { fam: "f-gather",
+  cs: ["gathering"],
+  week: 2,
+  diff: "easy",
+  q: "<p>While designing the seller portal's financial features, your team needs to comply with local banking regulations on fund transfers. You refer to official banking policies and competitor portal FAQs.</p><p>Which requirement gathering technique does this illustrate?</p>",
+  opts: ["Focus group", "Observation", "Documentation", "Interview"],
+  ans: 2,
+  why: ["False: no group.", "False: nobody is watched.", "True: banking policies and competitor FAQs are documents.", "False: nobody is questioned."],
+  sol: "<p>“Refer to official banking policies and competitor portal FAQs” → <b>documentation</b>.</p>",
+  trap: "Competitor FAQs can look like “observing competitors”." });
+PQ(SE, '2025T2', 136, 4, 'mcq', { fam: "f-smart",
+  cs: ["smart"],
+  week: 2,
+  diff: "moderate",
+  q: "<p>The following user story is proposed:</p><pre class=\"code\">As a seller, I want to get suggestions on bundling products based on previous\nbuyer behavior, so that I can increase cross-selling opportunities.</pre><p>The team agrees it's a valuable feature, but the Scrum Master notes that the story lacks a deadline or timeframe.</p><p>Which SMART criterion is lacking?</p>",
+  opts: ["Measurable", "Specific", "Time-boxed", "Relevant"],
+  ans: 2,
+  why: ["False: measurability is not raised.", "False: specificity is not raised.", "True: no deadline or timeframe.", "False: the team agrees it is valuable."],
+  sol: "<p>Missing deadline/timeframe → <b>Time-boxed</b>.</p>",
+  trap: "Relevant — but value was explicitly confirmed." });
+PQ(SE, '2025T3', 6, 4, 'msq', { fam: "f-gather",
+  cs: ["gathering"],
+  week: 2,
+  diff: "moderate",
+  q: "<p>You are developing features for the sales summary module of the seller portal. Different industries have different priorities: mobile sales teams care about launch day sales, whereas furniture sales teams care about 30-day sales trends.</p><p>Why might you conduct focus groups with sales managers from different industries? (More than one answer may be correct)</p>",
+  opts: ["To gain consensus on common requirements across industries.", "To highlight conflicts or differences between stakeholder needs.", "To observe how users perform tasks in their natural setting.", "To get detailed regulatory information from banks."],
+  ans: [0, 1],
+  why: ["True: a focus group can reach consensus on shared requirements.", "True: it also exposes where stakeholder needs differ — exactly the mobile vs furniture tension.", "False: that is naturalistic observation.", "False: regulatory detail comes from documentation."],
+  sol: "<p>A focus group gives multiple viewpoints at once: agreement <i>and</i> conflict. Options 3 and 4 name other techniques’ objectives. Answer: 1, 2.</p>",
+  trap: "Picking only consensus — conflicts surfacing is a benefit, not a failure." });
+PQ(SE, '2025T3', 7, 4, 'mcq', { fam: "f-frnfr",
+  cs: ["fr-nfr"],
+  week: 2,
+  diff: "easy",
+  q: "<p>Consider the following two requirements:</p><p>Requirement 1: The mobile banking app must complete a fund transfer transaction within 3 seconds. Requirement 2: The mobile banking app must allow users to view their account balance and transaction history.</p><p>Which of the following statements is true?</p>",
+  opts: ["Requirement 1 is a functional requirement, whereas Requirement 2 is a non- functional requirement.", "Requirement 2 is a functional requirement, whereas Requirement 1 is a non- functional requirement.", "Both requirements are functional requirements.", "Both the requirements are non-functional requirements."],
+  ans: 1,
+  why: ["False: reversed.", "True: R2 view balance is a capability; R1 within 3 seconds is performance.", "False: R1 is about time.", "False: R2 is a capability."],
+  sol: "<p>R1 NF, R2 F — note the order is flipped compared to other papers.</p>",
+  trap: "Option order: this time R1 is the NF one, so the usual “option 1” is wrong." });
+PQ(SE, '2025T3', 8, 4, 'mcq', { fam: "f-smart",
+  cs: ["smart"],
+  week: 2,
+  diff: "easy",
+  q: "<p>Consider the user story given below for a ride-sharing app and answer the question. Feature: Find nearby drivers</p><p>As a rider, I want to search for available drivers so that I can see driver details, estimated fare and arrival time within a reasonable time. The results must be displayed with clear sorting and filtering options. Now consider the following improvement in the user story. The phrase so that I can see driver details, estimated fare and arrival time within a reasonable time. is modified as: so that I can see driver details, estimated fare and arrival time within 4 seconds. It makes the user story more __________.</p>",
+  opts: ["Specific", "Measurable", "Achievable", "Relevant", "Timeboxed"],
+  ans: 1,
+  why: ["False.", "True: “reasonable time” → “4 seconds”.", "False.", "False.", "False: response time, not a work timeframe."],
+  sol: "<p>Number added → <b>Measurable</b>.</p>",
+  trap: "Long stem with sorting/filtering text distracts towards Specific." });
+PQ(SE, '2026T1', 6, 4, 'mcq', { fam: "f-gather",
+  cs: ["gathering"],
+  week: 2,
+  diff: "easy",
+  q: "<p>A software team wants to collect answers to specific, well-defined questions from thousands of geographically distributed sellers.</p><p>Which requirement-gathering technique is most appropriate?</p>",
+  opts: ["Interviews", "Focus groups", "Observation", "Questionnaires"],
+  ans: 3,
+  why: ["False: thousands of distributed interviews are impractical.", "False: groups cannot cover thousands of people.", "False: observation does not answer specific questions.", "True: specific questions to many distributed people."],
+  sol: "<p>Specific, well-defined questions + thousands + distributed → <b>questionnaires</b>.</p>",
+  trap: "None strong." });
+PQ(SE, '2026T1', 7, 4, 'mcq', { fam: "f-story",
+  cs: ["user-stories"],
+  week: 2,
+  diff: "easy",
+  q: "<p>Which of the following is a correct user story template as per BDD?</p>",
+  opts: ["Feature–Role–Time", "Input–Process–Output", "Role–Feature–Benefit", "Task–Module–Deadline"],
+  ans: 2,
+  why: ["False: no time element; order is wrong.", "False: that is the input→output view of a function.", "True: As a [role], I want [feature], so that [benefit].", "False: invented."],
+  sol: "<p>Role – Feature – Benefit.</p>",
+  trap: "Input–Process–Output is a real idea from elsewhere." });
+PQ(SE, '2026T1', 25, 4, 'msq', { fam: "f-frnfr",
+  cs: ["fr-nfr"],
+  week: 2,
+  diff: "moderate",
+  q: "<p>Which of the following are non-functional requirements? (Select all that apply)</p>",
+  opts: ["The system must display new products within 5 seconds", "The system should behave consistently over time", "The seller can update product prices", "The system should recover from invalid input"],
+  ans: [0, 1, 3],
+  why: ["True: a time limit → performance.", "True: consistent behaviour over time → reliability.", "False: updating prices is a capability → functional.", "True: recovering from invalid input → robustness."],
+  sol: "<p>Mark the quality words: within 5 seconds (performance), consistently over time (reliability), recover from invalid input (robustness). Answer: 1, 2, 4.</p>",
+  trap: "Option 2 has no number — reliability is NF even without one." });
+PQ(SE, '2026T2', 2, 4, 'mcq', { fam: "f-gather",
+  cs: ["gathering"],
+  week: 2,
+  diff: "moderate",
+  q: "<p>A software company is developing a payroll system for 500 companies.</p><p>The analyst prepares a fixed list of 25 questions and verbally asks exactly the same questions to HR managers from every company.</p><p>Which requirement gathering technique is being used?</p>",
+  opts: ["Unstructured interview", "Semi-structured interview", "Structured interview", "Observation"],
+  ans: 2,
+  why: ["False: unstructured has no fixed list.", "False: semi-structured allows free follow-ups; here exactly the same questions are asked.", "True: fixed list, verbally, identical for everyone.", "False: nobody is watched."],
+  sol: "<ol><li>“Verbally asks” → interview.</li><li>“Fixed list … exactly the same questions … every company” → structured.</li></ol>",
+  trap: "A fixed list of 25 questions to 500 companies feels like a questionnaire — but it is spoken." });
+PQ(SE, '2026T2', 11, 4, 'mcq', { fam: "f-frnfr",
+  cs: ["fr-nfr"],
+  week: 2,
+  diff: "easy",
+  q: "<p>Consider the following requirements for an online examination system:</p><p>Requirement 1: Students shall be able to submit answers online.</p><p>Requirement 2: The system shall process and save submissions within 2 seconds.</p><p>Which statement is true?</p>",
+  opts: ["Both are functional requirements.", "Requirement 1 is functional and Requirement 2 is non-functional.", "Requirement 1 is non-functional and Requirement 2 is functional.", "Both are non-functional requirements."],
+  ans: 1,
+  why: ["False: R2 has a time limit.", "True: submit answers = capability; within 2 seconds = performance.", "False: reversed.", "False: R1 is a capability."],
+  sol: "<p>R1 F, R2 NF.</p>",
+  trap: "None strong." });
+PQ(SE, '2026T2', 12, 4, 'mcq', { fam: "f-smart",
+  cs: ["smart"],
+  week: 2,
+  diff: "easy",
+  q: "<p>Consider the user story as follow:</p><p>As a customer,</p><p>I want to track my food delivery,</p><p>So that I know when my order will arrive.</p><p>The story is refined as:</p><p>\"...the delivery status must refresh every 15 seconds.\"</p><p>Which SMART property is improved?</p>",
+  opts: ["Specific", "Relevant", "Measurable", "Achievable"],
+  ans: 2,
+  why: ["False: no ambiguity removed.", "False: value unchanged.", "True: “refresh every 15 seconds” is verifiable.", "False: not split."],
+  sol: "<p>Number added → <b>Measurable</b>.</p>",
+  trap: "Specific is listed first." });
 
 /* ---- app/10_state.js ---- */
 /* ============================================================
