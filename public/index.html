@@ -5750,6 +5750,103 @@ PQ(SE, '2026T2', 19, 4, 'mcq', { fam: "f-solid",
   sol: "<p><b>Interface segregation</b>.</p>",
   trap: "None strong." });
 
+/* ---- courses/cs3001/extra.js ---- */
+/* ===================== Software Engineering — formulas, comparisons, sheets, sources, limits ===================== */
+
+/* ---------------- Formulas and frameworks ---------------- */
+[
+  { week: 1, t: 'Agile manifesto (four values)', f: 'Individuals & interactions <b>over</b> processes & tools · Working software <b>over</b> comprehensive documentation · Customer collaboration <b>over</b> contract negotiation · Responding to change <b>over</b> following a plan', words: '“Over” means valued more — the right-hand items still matter.' },
+  { week: 1, t: 'SDLC phases', f: 'Requirements → Design → Development → Testing → Maintenance', words: 'Release sits between Testing and Maintenance; anything after release is Maintenance.' },
+  { week: 2, t: 'User story template', f: 'As a <i>role</i>, I want <i>feature</i>, so that <i>benefit</i>.', words: 'Role–Feature–Benefit.' },
+  { week: 2, t: 'SMART', f: 'Specific · Measurable · Achievable · Relevant · Time-boxed', words: 'A number added → Measurable; a deadline → Time-boxed; a vague verb made precise → Specific.' },
+  { week: 3, t: 'Five usability goals', f: 'Learnability · Efficiency · Memorability · Errors (safety) · Satisfaction', words: 'Easy first time; fast for experts; easy to return to; few, recoverable errors; pleasant.' },
+  { week: 4, t: 'Basic COCOMO effort', f: 'E = a × (KLOC)<sup>b</sup> person-months; organic a = 2.4, b = 1.05 · semi-detached a = 3.0, b = 1.12 · embedded a = 3.6, b = 1.20', words: 'Pick the project type from the scenario, raise size in thousands of lines to b, multiply by a.', ex: 'Organic, 100 KLOC: 2.4 × 100<sup>1.05</sup> = 302.1 PM.' },
+  { week: 4, t: 'Intermediate COCOMO', f: 'E = a × (KLOC)<sup>b</sup> × EAF', words: 'Multiply (never add) the effort adjustment factor.', ex: 'Organic, 100 KLOC, EAF 1.64: 302.1 × 1.64 = 495.5 PM.' },
+  { week: 4, t: 'Cost from effort', f: 'Cost = E (person-months) × salary per person-month', words: 'Effort in person-months times monthly salary.', ex: 'Embedded 22 KLOC: 3.6 × 22<sup>1.2</sup> ≈ 147.0 PM × ₹10,000 ≈ ₹14.7 lakh.' },
+  { week: 4, t: 'Risk exposure', f: 'RE = probability × impact (loss)', words: 'Rank risks by RE; the largest is handled first.', ex: '0.3 × ₹3 lakh = ₹90,000.' },
+  { week: 4, t: 'Critical path', f: 'Project length = longest path through the activity network; slack = latest finish − earliest finish', words: 'A task starts only when all its predecessors finish; tasks on the longest chain have zero slack.' },
+  { week: 4, t: 'Velocity', f: 'Velocity = average story points completed per sprint; sprints needed = ⌈remaining points ÷ velocity⌉', words: 'Average what the team finished, then divide the remaining work by it and round up.', ex: 'Sprints 18, 22, 20, 24 → velocity 21.' },
+  { week: 5, t: 'Good design', f: 'High cohesion + low coupling', words: 'Each module does one thing; modules depend on each other as little as possible.' },
+  { week: 7, t: 'Cyclomatic complexity', f: 'CC = (number of if + elif + for + while + case) + 1', words: 'Count the decision keywords, never else, add one. CC = the minimum number of test cases for independent-path coverage.' },
+  { week: 7, t: 'Debugging steps', f: 'Reproduce → find the cause → investigate a fix → implement → test again', words: 'You cannot find a cause you cannot reproduce.' },
+  { week: 8, t: 'SOLID', f: 'Single responsibility · Open–closed · Liskov substitution · Interface segregation · Dependency inversion', words: 'One job; extend, don’t edit; subclasses substitutable; thin interfaces; depend on abstractions.' }
+].forEach(FORMULA);
+
+/* ---------------- Comparison tables ---------------- */
+[
+  { t: 'Alpha vs beta testing', head: ['', 'Alpha', 'Beta'], rows: [['Who tests', 'internal testers / staff', 'selected real external users'], ['Where', 'developer’s site', 'users’ own environment'], ['When', 'before beta', 'just before full release']], decide: 'Are the testers inside the developing company?' },
+  { t: 'Waterfall vs prototype vs spiral', head: ['', 'Waterfall', 'Prototype', 'Spiral'], rows: [['Best when', 'requirements clear and stable', 'requirements unclear', 'large, high-risk projects'], ['Client sees software', 'only at the end', 'early, as a throw-away prototype', 'each loop'], ['Key idea', 'one pass, phase by phase', 'learn requirements from a model', 'risk analysis every iteration']], decide: 'How clear are the requirements, and how big is the risk?' },
+  { t: 'Primary vs secondary vs tertiary users', head: ['', 'Primary', 'Secondary', 'Tertiary'], rows: [['Use of the system', 'use it directly and often', 'use it occasionally or through someone', 'never use it, but are affected or decide']], decide: 'Does the person touch the system, and how often?' },
+  { t: 'Functional vs non-functional', head: ['', 'Functional', 'Non-functional'], rows: [['Describes', 'what the system does', 'how well it does it'], ['Typical signal', 'an action or feature', 'a number, time limit, load, quality']], decide: 'Is there a measurable quality constraint?' },
+  { t: 'Ambiguous vs inconsistent vs incomplete', head: ['Problem', 'Meaning', 'Signal'], rows: [['Ambiguous', 'can be read in more than one way', 'vague word: fast, user-friendly'], ['Inconsistent', 'two requirements contradict', 'two stakeholders disagree'], ['Incomplete', 'something needed is missing', 'no rule for a case']], decide: 'One statement with two readings, two statements in conflict, or a gap?' },
+  { t: 'Storyboard vs paper prototype vs digital mock-up vs interactive prototype', head: ['Type', 'What it is', 'Interaction'], rows: [['Storyboard', 'sequence of sketches telling the user’s story', 'none'], ['Paper prototype', 'hand-drawn screens moved by a person', 'simulated by hand'], ['Digital mock-up', 'screens in a design tool; clickable images', 'limited, fabricated data'], ['Interactive prototype', 'working app-like flow (e.g. Figma flow, web app)', 'real interaction, data entry']], decide: 'Can the user actually enter data and see the system respond?' },
+  { t: 'Cohesion types (strongest → weakest)', head: ['Type', 'Elements grouped because…'], rows: [['Functional', 'they all contribute to one task'], ['Sequential', 'the output of one is the input of the next'], ['Communicational', 'they use the same data'], ['Procedural', 'they run in a fixed order, different purposes'], ['Temporal', 'they run at the same time (start-up)'], ['Logical', 'they are the same kind of thing, chosen by a flag'], ['Coincidental', 'no meaningful reason']], decide: 'What links the functions: one task, a data chain, shared data, order, time, category, or nothing?' },
+  { t: 'Coupling types (tightest → loosest)', head: ['Type', 'Modules share…'], rows: [['Content', 'one edits another’s internals'], ['Common', 'global data'], ['Control', 'a flag that decides the other’s behaviour'], ['Stamp', 'a whole data structure, of which only part is used'], ['Data', 'only the parameters needed']], decide: 'What crosses the boundary?' },
+  { t: 'Association vs aggregation vs composition vs inheritance', head: ['Relation', 'Symbol', 'Meaning'], rows: [['Association', 'plain line / arrow', 'uses / knows'], ['Aggregation', 'hollow diamond at the whole', 'has-a; part can exist alone'], ['Composition', 'filled diamond at the whole', 'owns; part dies with the whole'], ['Inheritance', 'hollow triangle at the parent', 'is-a']], decide: 'Can the part exist without the whole? Is it an is-a?' },
+  { t: 'Fault vs error vs failure', head: ['Term', 'Meaning', 'Example'], rows: [['Fault', 'the defective code', '<code>balance * 0.5</code>'], ['Error', 'actual ≠ intended behaviour', 'interest computed ten times too high'], ['Failure', 'observable symptom', 'customer sees the wrong amount']], decide: 'Code, behaviour, or what the user sees?' },
+  { t: 'Debugging techniques vs strategies', head: ['Technique', 'Use when'], rows: [['Logging', 'trace which code runs (print statements)'], ['Dump & diff', 'compare two runs'], ['Stepping', 'find the exact line with breakpoints'], ['Profiling', 'correct but slow: CPU and memory']], decide: 'Performance → profiling; otherwise what tool is described?' },
+  { t: 'Forward vs backward vs black-box debugging', head: ['Strategy', 'Starts from', 'Needs the source?'], rows: [['Forward', 'the triggering event', 'yes'], ['Backward', 'the wrong output', 'yes'], ['Input manipulation', 'varied inputs', 'no'], ['Black-box', 'documentation and examples', 'no — source unavailable']], decide: 'Can the developer see the code? If yes, where do they start?' },
+  { t: 'git fetch vs pull vs merge vs rebase', head: ['Command', 'Effect'], rows: [['git fetch', 'download remote changes; no merge'], ['git pull', 'fetch + merge into the current branch'], ['git merge', 'combine branches; history kept'], ['git rebase', 'replay your commits on top of another branch; linear history']], decide: 'Does it change your working branch, and how?' },
+  { t: 'Architecture styles', head: ['Style', 'Signature'], rows: [['Client–server', 'clients request, central server responds'], ['Pipe-and-filter', 'output of one stage is input of the next'], ['Peer-to-peer', 'no central server; nodes share directly'], ['MVC', 'model / view / controller separated']], decide: 'Where is the coordinator?' },
+  { t: 'ISP vs DIP vs LSP', head: ['Principle', 'Stem signature'], rows: [['ISP', 'a class is forced to implement methods it does not need'], ['DIP', 'a concrete dependency is replaced by an interface'], ['LSP', 'substituting a subclass for its base breaks the program']], decide: 'Forced methods, redirected dependency, or broken substitution?' },
+  { t: 'Builder vs Factory vs Adapter vs Facade', head: ['Pattern', 'Problem it solves'], rows: [['Builder', 'many optional fields / telescoping constructors'], ['Factory', 'hide which concrete class is created'], ['Adapter', 'incompatible interface or format'], ['Facade', 'many subsystem steps behind one call']], decide: 'Construction, choice of class, translation, or orchestration?' }
+].forEach(COMPARE);
+
+/* ---------------- Weekly revision sheets (the generated one-liner table, formulas and terms follow each) ---------------- */
+const SHEETTOP = (moves, traps) => `<h2>Exam moves</h2><ol>${moves.map(m => `<li>${m}</li>`).join('')}</ol><h2>Traps the papers set</h2><ul>${traps.map(t => `<li>${t}</li>`).join('')}</ul>`;
+SHEET(1, SHEETTOP(['Client type: human or program? inside or outside the developing company?', 'SDLC phase: before release → Testing; after release → Maintenance.', 'Alpha = internal testers; Beta = real users before full release.', 'Agile’s “over” means valued more, not abandoned.'],
+  ['Company staff called external users.', 'Prototype “delivered to the client” or “guarantees no bugs”.', 'Agile “eliminates documentation”.']));
+SHEET(2, SHEETTOP(['Primary uses it, secondary occasionally, tertiary never uses but is affected.', 'Technique from the verb: watched → observation; read policies → documentation; fixed list → structured interview.', 'A number or time limit makes a requirement non-functional.', 'SMART: added number → Measurable; added deadline → Time-boxed.'],
+  ['Two stakeholders contradicting = inconsistent, not ambiguous.', 'Courier phoned by the store called a secondary user.']));
+SHEET(3, SHEETTOP(['Usability goal from the symptom: first-time ease → Learnability; returning users → Memorability; losing work → Safety.', 'Prototype fidelity: sketches → storyboard/paper; clickable images → digital mock-up; real data entry → interactive.', 'Heuristic from the fix: shortcuts → Flexibility; undo/exit → Freedom; status shown → Visibility.'],
+  ['Flexibility vs Freedom.', 'Recognition over recall vs error recovery (see Sources).']));
+SHEET(4, SHEETTOP(['COCOMO: decide organic / semi-detached / embedded from the scenario first.', 'Multiply by EAF; multiply effort by monthly salary for cost.', 'Critical path = longest chain; a task waits for all predecessors.', 'Risk exposure = probability × impact; handle the largest first.', 'Velocity = average points per sprint.'],
+  ['Adding the EAF.', 'Taking the shortest path as critical.', 'Wrong project type for hardware-coupled systems (embedded).']));
+SHEET(5, SHEETTOP(['Judge cohesion and coupling separately.', 'Cohesion type from what links the functions.', 'Coupling type from what crosses the boundary.', 'Diagram arrows: filled diamond at the whole = composition; triangle at the parent = inheritance.'],
+  ['Sequential vs procedural.', 'Implementing an interface keyed as dependency in this course (see Sources).']));
+SHEET(6, '<p>Week 6 had no published content and no past-paper questions. Use it to revise Weeks 1–5 with the error notebook, the review queue and a cumulative mock.</p>');
+SHEET(7, SHEETTOP(['IDE = editor + debugger/refactoring; framework = app skeleton that calls you; Git = VCS.', 'fetch downloads; pull = fetch + merge; rebase master brings master in cleanly.', 'Wrong line = fault; visible symptom = failure.', 'Slow → profiling; print statements → logging.', 'No source code → black-box; from the trigger → forward.', 'CC = if + elif + for + while + 1, never else.'],
+  ['Counting else in CC.', 'Logging for performance.', 'Calling the wrong line an error.']));
+SHEET(8, SHEETTOP(['Chain of stages → pipe-and-filter; no central server → P2P.', 'Forced irrelevant methods → ISP; concrete class swapped for an interface → DIP; subclass breaks substitution → LSP.', 'Optional fields → Builder; incompatible format → Adapter; one method over many steps → Facade.', 'Creational = Factory, Builder, Singleton.'],
+  ['ISP for DIP diagrams.', 'Factory for telescoping constructors.', 'Facade for a converter class.']));
+
+/* ---------------- Sources & discrepancies ---------------- */
+const QL = id => `<a href="#/cs3001/q/cs3001-${id}">${id.replace('-', ' Q')}</a>`;
+[
+  { t: 'Week 6 has no content', detail: 'The revision notes state that Week 6 had no content, and none of the 253 past-paper questions tests a Week 6 topic.', res: 'Week 6 is shown as an honest empty week with a revision plan. Nothing is invented to fill it.' },
+  { t: '2025 T2 Q128 belongs to another subject', detail: 'The question asks about eigenvectors (matrix options); it is not Software Engineering.', res: 'Excluded from the bank and from every count.' },
+  { t: '2025 T3 Q25–Q26 have no visible sub-questions', detail: 'The paper shows the stems with zero marks and no options in the provided file.', res: 'Excluded; nothing is reconstructed.' },
+  { t: `Restaurant staff keyed as internal users (${QL('2025T3-2')})`, detail: 'Strictly, restaurant staff are not employees of the company building the delivery system.', res: 'The key is followed; it is consistent with 2026 T2 Q9. The note appears with the solution.' },
+  { t: `Usability goals: two options qualify (${QL('2023T3-181')})`, detail: 'Consistency is a heuristic, not one of the five usability goals, so both Consistency and Novelty are off the list; the key gives Novelty only.', res: 'Key followed; note shown.' },
+  { t: `Mock-up vs interactive prototype (${QL('2024T3-7')}, ${QL('2025T2-137')})`, detail: 'The notes describe digital mock-ups as using fabricated data; clickable images could be called interactive in general UX usage.', res: 'Keys followed; rule taught: real data entry and a working flow → interactive.' },
+  { t: `Recognition over recall vs error recovery (${QL('2024T1-36')})`, detail: 'The revision notes cite “IDE suggesting corrections” as recognition over recall; the key says support error recovery.', res: 'Key followed; the before/after rule is taught (helping after a mistake → error recovery).' },
+  { t: `Consistency described as a feedback heuristic (${QL('2023T3-183')})`, detail: 'The stem groups consistency under feedback; the course groups it under understanding.', res: 'Does not change the key.' },
+  { t: `Risk exposure printed as “0.9%” (${QL('2023T1-246')})`, detail: 'Risk exposure is probability × impact, not a percentage.', res: 'Treated as 0.9.' },
+  { t: `COCOMO rounding (${QL('2024T3-16')}, embedded 100 KLOC with EAF 1.88)`, detail: 'Exact effort is 904.3 PM; the papers round to 905, giving ₹4,52,50,000 (exact ₹4,52,14,000) and 1702 PM (exact 1700.1).', res: 'The verifier accepts the nearest option within 3%; solutions show both numbers.' },
+  { t: `Diagram mismatch (${QL('2024T3-18')})`, detail: 'The stem says food delivery app; the diagram is a text editor.', res: 'Diagram followed; the question is unaffected.' },
+  { t: `Interface implementation keyed as dependency (${QL('2024T2-14')}, ${QL('2025T2-147')})`, detail: 'Standard UML calls implementing an interface realization.', res: 'The course key (dependency) is followed and flagged in the family trap.' },
+  { t: `Functional vs sequential cohesion (${QL('2026T1-15')})`, detail: 'Functional cohesion is arguably also satisfied; the key is sequential because of the step dependency.', res: 'Key followed; note shown.' },
+  { t: `MSQs with a single answer (${QL('2023T3-191')}, ${QL('2023T3-192')})`, detail: 'Marked MSQ in the paper but only one option is keyed.', res: 'Kept as MSQ with one correct option, as in the exam.' },
+  { t: `Debugging without tools (${QL('2023T3-193')})`, detail: 'Option 3 (debugging can be done without tools or breakpoints) is true by the course’s own logging technique but is not keyed.', res: 'Key followed; note shown.' },
+  { t: `Boolean operators in cyclomatic complexity (${QL('2025T3-17')})`, detail: 'Strict McCabe counting adds one per <code>or</code>/<code>and</code>, giving 5; the key is 4.', res: 'The course rule (decision statements only) is taught and used by the in-app calculator.' },
+  { t: `Stem typo (${QL('2023T2-18')})`, detail: 'The first paragraph says components were objects of PurchasedComponent where the diagram shows ManufacturedComponent.', res: 'Reproduced as printed with a note.' },
+  { t: 'Regression testing and VeriSIM', detail: 'Both appear in the papers but only briefly in the notes.', res: 'Covered in the concepts that the questions map to; flagged as edge-of-syllabus.' }
+].forEach(SOURCE);
+
+/* ---------------- Known limitations ---------------- */
+[
+  'Weeks 9–12 are not built yet; the exam selector covers Weeks 1–8 only.',
+  'All past papers provided are Quiz 2 papers. There are no end-term past papers, so the end-term option is a cumulative mock built from quiz questions; nothing is labelled an end-term PYQ.',
+  'Diagrams from the papers are redrawn; layout differs from the originals while the content (classes, arrows, durations) is kept.',
+  'Answer keys were read from the colour of the selected option in the provided files. Where a key looks wrong it is followed and the disagreement is recorded above.',
+  'Harder variations and checkpoint questions are written for this platform and are always labelled as such; they are never presented as past-paper questions.',
+  'Short-answer checkpoints are self-graded against a model answer.',
+  'Exam intelligence describes what has been asked, not what will be asked.',
+  'Progress is stored only in this browser; export it from “Your data” to move devices.'
+].forEach(LIMIT);
+
+INTEL({ t: 'How to use this for Quiz 2', html: '<ol><li>Work week by week: concept → checkpoints → that week’s PYQs → variations.</li><li>Clear the error notebook and the review queue daily.</li><li>Take one per-week mock for each week, then the cumulative and the Spartan preset.</li><li>In the last two days, read the revision sheets and the comparison tables only.</li></ol>' });
+
 /* ---- app/10_state.js ---- */
 /* ============================================================
    Progress storage (localStorage, namespaced per course: prog:<code>),
