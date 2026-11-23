@@ -9,7 +9,7 @@ variations of those questions, timed mocks, and review tools.
 | Course | Weeks | Status |
 | --- | --- | --- |
 | Software Engineering (cs3001) | 1–8 | Done: 45 concepts, all 253 Quiz 2 past-paper questions mapped, 529 questions in total |
-| Strategies for Professional Growth | 1–8 | Planned (no past papers provided, so practice only) |
+| Strategies for Professional Growth (gn3001) | 1–8 | Done: 31 concepts, all 289 Quiz 1 and Quiz 2 past-paper questions mapped, 514 questions in total |
 
 The quiz syllabus for both courses is Weeks 1–8. The end-term option is a cumulative
 mock over the same weeks. No end-term past papers were provided, so nothing is labelled

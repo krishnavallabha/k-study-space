@@ -38,7 +38,13 @@ const CALC = {
   num(t) { const m = String(t).replace(/,/g, '').match(/-?\d+(\.\d+)?/); return m ? parseFloat(m[0]) : NaN; },
   /* Parse a typed numeric answer, accepting fractions like 3/4 */
   parse(s) { s = String(s).trim().replace(/,/g, ''); const f = s.match(/^(-?\d+(?:\.\d+)?)\s*\/\s*(-?\d+(?:\.\d+)?)$/); if (f) return parseFloat(f[1]) / parseFloat(f[2]); return s === '' ? NaN : Number(s); },
-  round: (x, d = 2) => Math.round(x * Math.pow(10, d)) / Math.pow(10, d)
+  round: (x, d = 2) => Math.round(x * Math.pow(10, d)) / Math.pow(10, d),
+  /* Personal finance (rates as fractions: 0.07 = 7%) */
+  fv: (p, r, n) => p * Math.pow(1 + r, n),                        // future value with annual compounding
+  cagr: (start, end, years) => (Math.pow(end / start, 1 / years) - 1) * 100,   // % per year
+  real: (nominal, inflation) => ((1 + nominal) / (1 + inflation) - 1) * 100,   // exact real return, %
+  rule72: years => 72 / years,                                    // % needed to double in `years`
+  netWorth: (assets, liabilities) => CALC.sum(assets) - CALC.sum(liabilities)
 };
 
 /* Recompute every key that carries calc(). Returns [{id, ok, msg}]. */
